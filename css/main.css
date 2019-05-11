@@ -390,6 +390,13 @@ footer .theme-by {
   .post-preview .post-title {
     font-size: 36px;
   }
+  .navbar>.container-fluid .navbar-brand {
+    margin-left: 0;
+  }
+
+  .navbar-custom .nav li {
+    margin-right: 15px;
+  }
 }
 
 /* --- Tags --- */
