@@ -14,7 +14,7 @@ baseurl: ""
 # Of course don't forget to change the username and projectname to YOUR username and project
 
 # Name of website
-title: My website
+title: Cloud
 
 # Short description of your site
 description: A virtual proof that name is awesome!
@@ -69,7 +69,7 @@ author:
 social-network-links:
   rss: true
   email: "ninhle.9984@gmail.com"
-  facebook: cloud.9984
+  facebook: april.9984
   github: oLeVanNinh
   twitter: Ninh99505310
 #  reddit: yourname
@@ -123,7 +123,7 @@ gtag: "UA-136873147-1"
 # disqus: ""
 
 # To use Facebook Comments, fill in a Facebook App ID
-# fb_comment_id: ""
+fb_comment_id: "831181610583754"
 
 # Staticman support
 staticman:
