@@ -114,9 +114,6 @@ author:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/oLeVanNinh"
-    - label: "Instagram"
-      icon: "fab fa-fw fa-instagram"
-      url: "https://www.instagram.com/cloud_9984/"
 
 # Site Footer
 footer:
