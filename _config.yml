@@ -94,7 +94,7 @@ analytics:
 # Site Author
 author:
   name             : "Cloud"
-  avatar           : "/img/avatar.jpg" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  avatar           : "/img/avatar.jpeg" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
   bio              : "Just some boring stuff. <br />The place I document my journey."
   # location         : "Somewhere"
   email            :
