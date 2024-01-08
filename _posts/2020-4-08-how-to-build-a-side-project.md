@@ -2,6 +2,7 @@
 title: How To Build A Side Project
 tags:
   - random
+  - work
 ---
 
 ## Why side project?

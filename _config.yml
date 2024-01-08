@@ -204,14 +204,21 @@ sass:
 
 # Outputting
 permalink: /:categories/:title/
-paginate: 10 # amount of posts to show
-paginate_path: /page:num/
 timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+paginate_path: "/legacy/page:num/"
+pagination:
+  enabled: true
+  per_page: 5
+  permalink:  "/legacy/page:num/"
+  limit: 0
+  sort_field: 'date'
+  sort_reverse: true
+  indexpage: 'index'
 
 
 # Plugins (previously gems:)
 plugins:
-  - jekyll-paginate
+  - jekyll-paginate-v2
   - jekyll-sitemap
   - jekyll-gist
   - jekyll-feed
@@ -220,7 +227,6 @@ plugins:
 
 # mimic GitHub Pages with --safe
 whitelist:
-  - jekyll-paginate
   - jekyll-sitemap
   - jekyll-gist
   - jekyll-feed

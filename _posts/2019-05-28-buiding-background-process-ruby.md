@@ -3,6 +3,7 @@ title:  Xây dựng hệ thống xử lý background bằng ruby
 tags:
   - ruby
   - background
+  - work
 ---
 
 # 1. Lợi ích của việc sử dụng background job

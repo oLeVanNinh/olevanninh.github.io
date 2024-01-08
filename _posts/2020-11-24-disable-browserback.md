@@ -2,6 +2,7 @@
 title: "How to disable the browser back button in JS?"
 tags:
   - javascript
+  - work
 ---
 ## Introduction
 Back to the previous page is natively controlled by your browser, it's not a good idea for the client site perform to prevent browser back, but sometimes you have a valid reason to do that. In this post, I will show you some ways to achieve this purpose, in case I have to do the same thing in the same situation and some of my experience.
