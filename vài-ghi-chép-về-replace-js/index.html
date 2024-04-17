@@ -1,0 +1,714 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.1 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Vài ghi chép về replace function JS - Home</title>
+<meta name="description" content="Việc xử lý String là việc được thực hiện khá nhiều trong lập trình, một trong các thao tác thực hiện trong số đó là replace String. Trong ngôn ngữ Javascript, method được dùng để xử lý là replace, là một Standard built-in method của String. Tài liệu về cách sử dụng được viết đầy đủ MDN, tóm tắt lại cơ bản như sau: ">
+
+
+  <meta name="author" content="Cloud">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Home">
+<meta property="og:title" content="Vài ghi chép về replace function JS">
+<meta property="og:url" content="/v%C3%A0i-ghi-ch%C3%A9p-v%E1%BB%81-replace-js/">
+
+
+  <meta property="og:description" content="Việc xử lý String là việc được thực hiện khá nhiều trong lập trình, một trong các thao tác thực hiện trong số đó là replace String. Trong ngôn ngữ Javascript, method được dùng để xử lý là replace, là một Standard built-in method của String. Tài liệu về cách sử dụng được viết đầy đủ MDN, tóm tắt lại cơ bản như sau: ">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2019-06-09T00:00:00+07:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="/v%C3%A0i-ghi-ch%C3%A9p-v%E1%BB%81-replace-js/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "",
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Home Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          Home
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/work">Work</a>
+            </li><li class="masthead__menu-item">
+              <a href="/personal">Personal</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/img/avatar.jpeg" alt="Cloud" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Cloud</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Just some boring stuff. <br />The place I document my journey.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+        
+          
+            <li><a href="mailto:ninhle.9984@gmail.com" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-envelope-square" aria-hidden="true"></i><span class="label">Email</span></a></li>
+          
+        
+          
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Vài ghi chép về replace function JS">
+    <meta itemprop="description" content="Việc xử lý String là việc được thực hiện khá nhiều trong lập trình, một trong các thao tác thực hiện trong số đó là replace String. Trong ngôn ngữ Javascript,method được dùng để xử lý là replace, là một Standard built-in method của String. Tài liệu về cách sử dụng được viết đầy đủ MDN, tóm tắt lại cơ bản như sau:">
+    <meta itemprop="datePublished" content="2019-06-09T00:00:00+07:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Vài ghi chép về replace function JS
+</h1>
+          
+            <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime=""></time>
+
+
+
+
+  3 minute read
+
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>Việc xử lý <code class="language-plaintext highlighter-rouge">String</code> là việc được thực hiện khá nhiều trong lập trình, một trong các thao tác thực hiện trong số đó là <code class="language-plaintext highlighter-rouge">replace String</code>. Trong ngôn ngữ <code class="language-plaintext highlighter-rouge">Javascript</code>,
+method được dùng để xử lý là <code class="language-plaintext highlighter-rouge">replace</code>, là một Standard built-in method của <code class="language-plaintext highlighter-rouge">String</code>. Tài liệu về cách sử dụng được viết đầy đủ <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace">MDN</a>, tóm tắt lại cơ bản như sau:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/*
+Syntax sử dụng:
+ var newStr = str.replace(keyword || Regex, newSubstr || function)
+Phần đầu có thể truyền vào là một chuỗi String hoặc Regex, phần sau sẽ
+là chuỗi String để thay thế hoặc một callback function Callback functions
+sẽ nhận vào 3 parameter là match, offset và string ban đầu.
+*/</span>
+<span class="dl">'</span><span class="s1">hello world</span><span class="dl">'</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="dl">'</span><span class="s1">h</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">H</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// Hello world</span>
+
+<span class="dl">'</span><span class="s1">hello world</span><span class="dl">'</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/l/g</span><span class="p">,</span> <span class="dl">'</span><span class="s1">n</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// henno wornd"</span>
+
+<span class="dl">'</span><span class="s1">hello world</span><span class="dl">'</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/l/g</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">match</span><span class="p">,</span> <span class="nx">offset</span><span class="p">,</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">`Matching: </span><span class="p">${</span><span class="nx">match</span><span class="p">}</span><span class="s2">, offset: </span><span class="p">${</span><span class="nx">offset</span><span class="p">}</span><span class="s2">, string: </span><span class="p">${</span><span class="nx">string</span><span class="p">}</span><span class="s2">`</span><span class="p">)</span>
+  <span class="k">return</span> <span class="dl">'</span><span class="s1">n</span><span class="dl">'</span>
+<span class="p">})</span>
+<span class="cm">/*
+Matching: l, offset: 2, string: hello world
+Matching: l, offset: 3, string: hello world
+Matching: l, offset: 9, string: hello world
+"henno wornd"
+*/</span>
+</code></pre></div></div>
+<h2 id="problem">Problem</h2>
+
+<p>Sự thật là sẽ chẳng có cái bài viết này cho đến khi tui có làm một task nho nhỏ là highlight keyword của kết quả search trả về.
+Function ban đầu trả như sau chỉ đơn giản như sau:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="kd">var</span> <span class="nx">s_tag</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">&lt;span class="search-result"&gt;</span><span class="dl">'</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">e_tag</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">&lt;/span&gt;</span><span class="dl">'</span><span class="p">;</span>
+
+  <span class="nb">String</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">keyword</span><span class="p">,</span> <span class="nx">s_tag</span> <span class="o">+</span> <span class="nx">keyword</span> <span class="o">+</span> <span class="nx">e_tag</span><span class="p">);</span>
+
+  <span class="dl">"</span><span class="s2">Everything is Illuminated</span><span class="dl">"</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="dl">"</span><span class="s2">E</span><span class="dl">"</span><span class="p">,</span> <span class="nx">s_tag</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">E</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">e_tag</span><span class="p">);</span>
+<span class="c1">//"&lt;span class="search-result"&gt;E&lt;/span&gt;verything is Illuminated"</span>
+</code></pre></div></div>
+
+<p>Nếu chỉ dừng lại ở đây thì mọi thứ đều tốt đẹp và chẳng có gì để làm tiếp, cho đến khi tui quyết định mở rộng nó thành highlight toàn bộ keyword match và bất kể là có sensetive hay không.
+Ban đầu tui nghĩ mọi chuyện khá là đơn giản, chỉ việc match toàn bộ keyword, sau đó lần lượt replace từng thằng một:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">keyword_highlighting</span><span class="p">(</span><span class="nx">keyword</span><span class="p">,</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">pattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">keyword</span><span class="p">,</span> <span class="dl">'</span><span class="s1">gi</span><span class="dl">'</span><span class="p">);</span>
+  <span class="kd">let</span> <span class="nx">matches</span> <span class="o">=</span> <span class="nx">string</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">pattern</span><span class="p">);</span>
+  <span class="c1">// Chắc chắn ko bị duplicate thằng nào.</span>
+  <span class="nx">matches</span> <span class="o">=</span> <span class="p">[...</span><span class="k">new</span> <span class="nb">Set</span><span class="p">(</span><span class="nx">matches</span><span class="p">)];</span>
+
+  <span class="nx">matches</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">match</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">matching_pattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">match</span><span class="p">,</span> <span class="dl">'</span><span class="s1">g</span><span class="dl">'</span><span class="p">);</span>
+    <span class="nx">string</span> <span class="o">=</span> <span class="nx">string</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">matching_pattern</span><span class="p">,</span> <span class="nx">s_tag</span> <span class="o">+</span> <span class="nx">match</span> <span class="o">+</span> <span class="nx">e_tag</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">string</span><span class="p">)</span>
+  <span class="p">});</span>
+
+  <span class="k">return</span> <span class="nx">string</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">string</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">Everything is Illuminated</span><span class="dl">"</span>
+<span class="nx">keyword_highlighting</span><span class="p">(</span><span class="dl">"</span><span class="s2">i</span><span class="dl">"</span><span class="p">,</span> <span class="nx">string</span><span class="p">)</span>
+<span class="c1">// Everything is Illuminated</span>
+<span class="c1">// Thật ra là chỗ mấy chữ i cho hiển thị có đổi màu chút xíu 😌</span>
+
+<span class="nx">keyword_highlighting</span><span class="p">(</span><span class="dl">"</span><span class="s2">e</span><span class="dl">"</span><span class="p">,</span> <span class="nx">string</span><span class="p">)</span>
+<span class="c1">// earch-result"&gt;Everything is Illuminated</span>
+<span class="c1">// WTF 😳😳😳</span>
+</code></pre></div></div>
+
+<p>Vấn đề nằm ở chỗ là khi keyword tồn tại trong cả <code class="language-plaintext highlighter-rouge">s_tag</code> và <code class="language-plaintext highlighter-rouge">e_tag</code> thì ở chỗ phần <code class="language-plaintext highlighter-rouge">forEach</code> chạy sẽ replace cả keyword nằm trong thẻ đó.
+Khi keyword là <code class="language-plaintext highlighter-rouge">e</code> thì kết quả function trả về thật sự sẽ là:</p>
+
+<p><code class="language-plaintext highlighter-rouge">&lt;span class="s&lt;span class="search-result"&gt;e&lt;/span&gt;arch-r&lt;span class="search-result"&gt;e&lt;/span&gt;sult"&gt;E&lt;/span&gt;v&lt;span class="search-result"&gt;e&lt;/span&gt;rything is Illuminat&lt;span class="search-result"&gt;e&lt;/span&gt;d</code></p>
+
+<h2 id="solution">Solution</h2>
+
+<p>Biết được nguyên nhân rồi thì đi tìm giải pháp, giải pháp đầu tiên tui nghĩ ra là viết một đoạn <code class="language-plaintext highlighter-rouge">Regex</code> sao cho không nó không match với các keyword nằm trong thẻ <code class="language-plaintext highlighter-rouge">tag</code>.
+Sau một hồi suy nghĩ rồi, rồi lấy gương ra soi, nhìn thật kĩ mặt mình, tui nhận ra là tui đ** đủ khả năng để viết 🙁, bạn nào tình cờ đọc qua viết được thì có thể comment xuống dưới nha.
+Cuối cùng thì tui chọn giải pháp đơn giản hơn, là tui sẽ match cả thẻ <code class="language-plaintext highlighter-rouge">tag</code> và <code class="language-plaintext highlighter-rouge">keyword</code>, nhưng lúc replace sẽ kiểm tra xem nếu đó là <code class="language-plaintext highlighter-rouge">tag</code> thì sẽ return về chính nó, để làm được điều này cũng
+phải nhờ đến sự magic của callback trong replace 🤗. Implement phần này viết lại <code class="language-plaintext highlighter-rouge">function</code> như sau:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="kd">function</span> <span class="nx">keyword_highlighting</span><span class="p">(</span><span class="nx">keyword</span><span class="p">,</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">pattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">keyword</span><span class="p">,</span> <span class="dl">"</span><span class="s2">gi</span><span class="dl">"</span><span class="p">);</span>
+    <span class="kd">let</span> <span class="nx">matches</span> <span class="o">=</span> <span class="nx">string</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">pattern</span><span class="p">);</span>
+    <span class="nx">matches</span> <span class="o">=</span> <span class="p">[...</span><span class="k">new</span> <span class="nb">Set</span><span class="p">(</span><span class="nx">matches</span><span class="p">)];</span>
+
+    <span class="nx">matches</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">match</span><span class="p">){</span>
+      <span class="kd">let</span> <span class="nx">matching_pattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="s2">`&lt;[^&lt;&gt;]+&gt;|</span><span class="p">${</span><span class="nx">match</span><span class="p">}</span><span class="s2">`</span><span class="p">,</span> <span class="dl">"</span><span class="s2">g</span><span class="dl">"</span><span class="p">);</span>
+      <span class="nx">string</span> <span class="o">=</span> <span class="nx">string</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">matching_pattern</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">matched</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">matched</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">&lt;</span><span class="dl">'</span> <span class="p">?</span> <span class="nx">matched</span> <span class="p">:</span> <span class="p">(</span><span class="nx">s_tag</span> <span class="o">+</span> <span class="nx">matched</span> <span class="o">+</span> <span class="nx">e_tag</span><span class="p">)</span>
+      <span class="p">})</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="p">}</span>
+
+<span class="nx">keyword_highlighting</span><span class="p">(</span><span class="dl">'</span><span class="s1">e</span><span class="dl">'</span><span class="p">,</span> <span class="nx">string</span><span class="p">)</span>
+<span class="c1">// Everything is Illuminated</span>
+<span class="c1">// Working fine</span>
+</code></pre></div></div>
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Callback trong <code class="language-plaintext highlighter-rouge">JS</code> là thứ vô cùng mạnh mẽ, như tui nghĩ sẽ chẳng bao giờ sẽ phải dùng đến callback trong replace vì như trên đã đủ rồi, nhưng trong nhiều trường hợp nó lại giúp
+giải quyết vẫn đề đơn giản hơn nhiều. Như ông thầy tui bảo: “Sẽ có một ngày thứ em nghĩ là không dùng đến sẽ cứu em” sau khi thầy xem xong bộ phim <code class="language-plaintext highlighter-rouge">Người trở về từ sao Hỏa</code> 😎.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/tags/#javascript" class="page__taxonomy-item" rel="tag">javascript</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#replace-callback" class="page__taxonomy-item" rel="tag">replace callback</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#replace" class="page__taxonomy-item" rel="tag">replace</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#work" class="page__taxonomy-item" rel="tag">work</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2019-06-09T00:00:00+07:00">June 9, 2019</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=V%C3%A0i+ghi+ch%C3%A9p+v%E1%BB%81+replace+function+JS%20%2Fv%25C3%25A0i-ghi-ch%25C3%25A9p-v%25E1%25BB%2581-replace-js%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=%2Fv%25C3%25A0i-ghi-ch%25C3%25A9p-v%25E1%25BB%2581-replace-js%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=%2Fv%25C3%25A0i-ghi-ch%25C3%25A9p-v%25E1%25BB%2581-replace-js%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/buiding-background-process-ruby/" class="pagination--pager" title="Xây dựng hệ thống xử lý background bằng ruby
+">Previous</a>
+    
+    
+      <a href="/how-to-build-a-side-project/" class="pagination--pager" title="How To Build A Side Project
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+      <div class="page__comments">
+  
+  
+      <h4 class="page__comments-title">Leave a comment</h4>
+      <section id="disqus_thread"></section>
+    
+</div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You may also enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/getting-start-with-cf/" rel="permalink">Play with Cloud Formation
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime="2024-01-14T00:00:00+07:00">January 14 2024</time>
+
+
+
+
+  15 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">CloudFormation is a service provided by AWS to help users easily build, set up, and provision resources on AWS quickly, reducing the effort required for mana...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/build-happy-life/" rel="permalink">Xây dựng cuộc sống hạnh phúc
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime="2024-01-06T00:00:00+07:00">January 6 2024</time>
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Mình là người công giáo, mình vẫn nhớ như in câu giáo lí đầu tiên mình được học trước khi được xưng tội:
+
+
+  Hỏi: Ta sống ở đời này để làm gì? 
+Thưa: Ta sống...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/2023/" rel="permalink">2023
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime="2023-12-31T00:00:00+07:00">December 31 2023</time>
+
+
+
+
+  10 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Mình ngồi gõ những dòng này vào đúng 31-12, ngày cuối cùng của năm 2023. Mình nghĩ những ngày cuối năm luôn là thời điểm tốt để review lại những gì đã xảy ra...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/wishes/" rel="permalink">Thế giới của những ước muốn
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime="2023-10-29T00:00:00+07:00">October 29 2023</time>
+
+
+
+
+  6 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Còn nhớ ngày này năm ngoái mình còn đang đi healing ở trên Sóc Sơn, lần ấy đi vậy mà cũng vật vã lắm.
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2024 Home. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M6CS1DM42V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-M6CS1DM42V', { 'anonymize_ip': false});
+</script>
+
+
+
+
+
+
+    
+  <script>
+    var disqus_config = function () {
+      this.page.url = "/v%C3%A0i-ghi-ch%C3%A9p-v%E1%BB%81-replace-js/";  /* Replace PAGE_URL with your page's canonical URL variable */
+      this.page.identifier = "/vài-ghi-chép-về-replace-js"; /* Replace PAGE_IDENTIFIER with your page's unique identifier variable */
+    };
+    (function() { /* DON'T EDIT BELOW THIS LINE */
+      var d = document, s = d.createElement('script');
+      s.src = 'https://ninhle-dev.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+
+
+
+
+
+  </body>
+</html>

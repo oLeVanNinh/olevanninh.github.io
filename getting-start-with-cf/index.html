@@ -1,0 +1,1146 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.1 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Play with Cloud Formation - Home</title>
+<meta name="description" content="CloudFormation is a service provided by AWS to help users easily build, set up, and provision resources on AWS quickly, reducing the effort required for management. Using CloudFormation brings benefits such as: ">
+
+
+  <meta name="author" content="Cloud">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Home">
+<meta property="og:title" content="Play with Cloud Formation">
+<meta property="og:url" content="/getting-start-with-cf/">
+
+
+  <meta property="og:description" content="CloudFormation is a service provided by AWS to help users easily build, set up, and provision resources on AWS quickly, reducing the effort required for management. Using CloudFormation brings benefits such as: ">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2024-01-14T00:00:00+07:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="/getting-start-with-cf/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "",
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Home Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          Home
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/work">Work</a>
+            </li><li class="masthead__menu-item">
+              <a href="/personal">Personal</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/img/avatar.jpeg" alt="Cloud" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Cloud</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Just some boring stuff. <br />The place I document my journey.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+        
+          
+            <li><a href="mailto:ninhle.9984@gmail.com" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-envelope-square" aria-hidden="true"></i><span class="label">Email</span></a></li>
+          
+        
+          
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Play with Cloud Formation">
+    <meta itemprop="description" content="CloudFormation is a service provided by AWS to help users easily build, set up, and provision resources on AWS quickly, reducing the effort required for management. Using CloudFormation brings benefits such as:">
+    <meta itemprop="datePublished" content="2024-01-14T00:00:00+07:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Play with Cloud Formation
+</h1>
+          
+            <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime=""></time>
+
+
+
+
+  14 minute read
+
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>CloudFormation is a service provided by AWS to help users easily build, set up, and provision resources on AWS quickly, reducing the effort required for management. Using CloudFormation brings benefits such as:</p>
+
+<ul>
+  <li>Using it as an Infrastructure as Code (IaC) tool, where all AWS resources are managed through templates, making automation straightforward.</li>
+  <li>Facilitating the rapid provisioning of resources in an environment, which is inherently faster than manual human operations. Additionally, in case of a need for recovery, automation reduces the system’s Recovery Time Objective (RTO).
+Just imagine uploading the template, clicking a few buttons, and it’s done.</li>
+  <li>Minimizing human errors because everything is automated.</li>
+  <li>Serving as documentation and can be used with management tools like source control to make system management on AWS more straightforward.</li>
+</ul>
+
+<h2 id="using-cloudformation-on-the-aws-console">Using CloudFormation on the AWS console</h2>
+
+<p>From the AWS console, go to Service, select CloudFormation, then click on Create Stack, and choose With new resources.
+<img src="/img/14_01_2024/console.png" alt="" /></p>
+
+<p>Here, there are three options for creation:</p>
+<ul>
+  <li>Template is ready: Use when you already have a template ready. You can either upload a file directly from your local machine or provide the URL of a file saved on S3.</li>
+  <li>Use a sample template: Use a template provided by AWS.</li>
+  <li>Create template in Designer: This is a useful tool for building templates. It allows you to visually examine the current system, validate templates, and convert between YAML and JSON template formats.
+<img src="/img/14_01_2024/designer.png" alt="" /></li>
+</ul>
+
+<h2 id="template-components">Template Components</h2>
+<p>A CloudFormation template can be written in two formats: JSON and YAML. Compared to JSON, YAML is more concise and also supports comments. A complete CloudFormation template will include the following components:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">AWSTemplateFormatVersion</span><span class="pi">:</span>
+<span class="na">Description</span><span class="pi">:</span>
+<span class="na">Parameters</span><span class="pi">:</span>
+<span class="na">Mappings</span><span class="pi">:</span>
+<span class="na">Resources</span><span class="pi">:</span>
+<span class="na">Outputs</span><span class="pi">:</span>
+</code></pre></div></div>
+<ul>
+  <li>AWSTemplateFormatVersion: Specifies the version for the template. If this component is not specified in the template, CloudFormation will automatically use the latest version. Currently, the latest version is ‘2010-09-09’, which is also the only valid value.</li>
+  <li>Description: Allows you to add comments to explain the template.</li>
+  <li>Parameters: Allows you to pass custom parameters when creating the template. When creating it through the console, there will be a step to select these parameters.
+<img src="/img/14_01_2024/paramter.png" alt="" /></li>
+  <li>Mappings: Used to create a key-value mapping, which is used to retrieve corresponding values for specified keys when needed by using the intrinsic function <code class="language-plaintext highlighter-rouge">Fn::FindInMap</code></li>
+  <li>Resources: This is a mandatory component of the template. Without it, the stack cannot be created. This section is used to declare the resources on the stack that need to be initialized.</li>
+  <li>Outputs: This section is used to declare values needed after the stack has been created. The values will be displayed in the Outputs section on the UI console. For example, when creating a load balancer after the resources are created, you may want to retrieve the DNS name of that load balancer for testing.</li>
+</ul>
+
+<h2 id="creating-a-stack-with-cloudformation">Creating a stack with CloudFormation</h2>
+<p>The template you plan to create in Designer may look like the following:
+<img src="/img/14_01_2024/scale.png" alt="" /></p>
+
+<p>The template above is used to create resources in the style of a bastion host jump box. The template includes the following resources:</p>
+<ul>
+  <li>Creates a custom VPC including: 3 public subnets, 3 app private subnets, and 3 db private subnets located in 3 different availability zones.</li>
+  <li>App instance group resides in the app private subnets, allowing only SSH traffic from the bastion host and HTTP traffic from the Load Balancer to enter.</li>
+  <li>The RDS database is placed in the db private subnet, allowing only SQL traffic to enter from a specified security group.</li>
+</ul>
+
+<h2 id="parameters-for-the-template">Parameters for the template</h2>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">Parameters</span><span class="pi">:</span>
+  <span class="na">AMIName</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s">String</span>
+    <span class="na">Description</span><span class="pi">:</span> <span class="s">Name for AMI creation</span>
+    <span class="na">ConstraintDescription</span><span class="pi">:</span> <span class="s">Name for image</span>
+    <span class="na">MinLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">6'</span>
+    <span class="na">MaxLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">64'</span>
+  <span class="na">DBName</span><span class="pi">:</span>
+    <span class="na">Default</span><span class="pi">:</span> <span class="s">MyDatabase</span>
+    <span class="na">Description</span><span class="pi">:</span> <span class="s">MySQL database name</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s">String</span>
+    <span class="na">MinLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">1'</span>
+    <span class="na">MaxLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">64'</span>
+  <span class="na">DBUser</span><span class="pi">:</span>
+    <span class="na">NoEcho</span><span class="pi">:</span> <span class="s1">'</span><span class="s">true'</span>
+    <span class="na">Description</span><span class="pi">:</span> <span class="s">Username for MySQL database access</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s">String</span>
+    <span class="na">MinLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">1'</span>
+    <span class="na">MaxLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">64'</span>
+    <span class="na">AllowedPattern</span><span class="pi">:</span> <span class="s1">'</span><span class="s">[a-zA-Z][a-zA-Z0-9]*'</span>
+    <span class="na">ConstraintDescription</span><span class="pi">:</span> <span class="s">must begin with a letter and contain only alphanumeric characters</span>
+  <span class="na">DBRootPassword</span><span class="pi">:</span>
+    <span class="na">NoEcho</span><span class="pi">:</span> <span class="s1">'</span><span class="s">true'</span>
+    <span class="na">Description</span><span class="pi">:</span> <span class="s">Password for mysql access</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s">String</span>
+    <span class="na">MinLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">8'</span>
+    <span class="na">MaxLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">41'</span>
+    <span class="na">AllowedPattern</span><span class="pi">:</span> <span class="s1">'</span><span class="s">[a-zA-Z0-9]*'</span>
+    <span class="na">ConstraintDescription</span><span class="pi">:</span> <span class="s">must contain only alphanumeric characters</span>
+  <span class="na">InstanceType</span><span class="pi">:</span>
+    <span class="na">Description</span><span class="pi">:</span> <span class="s">WebServer EC2 instance type</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s">String</span>
+    <span class="na">Default</span><span class="pi">:</span> <span class="s">t2.small</span>
+    <span class="na">AllowedValues</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">t1.micro</span>
+      <span class="pi">-</span> <span class="s">t2.nano</span>
+      <span class="pi">-</span> <span class="s">t2.micro</span>
+      <span class="pi">-</span> <span class="s">t2.small</span>
+      <span class="pi">-</span> <span class="s">t2.medium</span>
+      <span class="s">...</span>
+    <span class="na">ConstraintDescription</span><span class="pi">:</span> <span class="s">must be a valid EC2 instance type.</span>
+  <span class="na">KeyName</span><span class="pi">:</span>
+    <span class="na">Description</span><span class="pi">:</span> <span class="s">Name of an existing EC2 KeyPair to enable SSH access to the instances</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::KeyPair::KeyName'</span>
+    <span class="na">ConstraintDescription</span><span class="pi">:</span> <span class="s">must be the name of an existing EC2 KeyPair.</span>
+  <span class="na">SSHLocation</span><span class="pi">:</span>
+    <span class="na">Description</span><span class="pi">:</span> <span class="s">The IP address range that can be used to SSH to the EC2 instances</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s">String</span>
+    <span class="na">MinLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">9'</span>
+    <span class="na">MaxLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">18'</span>
+    <span class="na">Default</span><span class="pi">:</span> <span class="s">0.0.0.0/0</span>
+    <span class="na">AllowedPattern</span><span class="pi">:</span> <span class="s1">'</span><span class="s">(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'</span>
+    <span class="na">ConstraintDescription</span><span class="pi">:</span> <span class="s">must be a valid IP CIDR range of the form x.x.x.x/x.</span>
+</code></pre></div></div>
+<p>The parameters used in the template include:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">AMIName</code>: Used to name the image when creating an AMI for updating the Launch Configuration.</li>
+  <li><code class="language-plaintext highlighter-rouge">DBUser</code>, <code class="language-plaintext highlighter-rouge">DBName</code>, <code class="language-plaintext highlighter-rouge">DBRootPassword</code>: Used to create the RDS database.</li>
+  <li><code class="language-plaintext highlighter-rouge">KeyName</code>: Specifies the key when using SSH to create an EC2 instance.</li>
+  <li><code class="language-plaintext highlighter-rouge">SSHLocation</code>: Specifies the source IP allowed to SSH into the instance.</li>
+</ul>
+
+<p>The structure of a parameter is as follows, with the properties used for the parameters mentioned above:</p>
+<ul>
+  <li>Parameter Name</li>
+  <li>Description: Description of the parameter.</li>
+  <li>Type: Type of the parameter. CloudFormation supports various types such as String, Number, List<Number>, and also allows listing other AWS resources like AWS::EC2::KeyPair::KeyName (keypair), ListAWS::EC2::VPC::Id (list of VPCs), ListAWS::EC2::SecurityGroup::Id (list of security groups), etc.</Number></li>
+  <li>Min, MaxLength: Limits on the number of characters for the parameter.</li>
+  <li>Default: Default value of the parameter.</li>
+  <li>AllowedPattern: Allows specifying a pattern, like a regex, to ensure that the parameter’s data conforms to that pattern.</li>
+  <li>NoEcho: Similar to a password field in an HTML form, setting it to true means the value of the field will not be displayed in the UI but will be hidden.</li>
+</ul>
+
+<h2 id="maping">Maping</h2>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">Mappings</span><span class="pi">:</span>
+  <span class="na">AWSInstanceType2Arch</span><span class="pi">:</span>
+    <span class="na">t1.micro</span><span class="pi">:</span>
+      <span class="na">Arch</span><span class="pi">:</span> <span class="s">HVM64</span>
+    <span class="na">t2.nano</span><span class="pi">:</span>
+      <span class="na">Arch</span><span class="pi">:</span> <span class="s">HVM64</span>
+    <span class="s">...</span>
+  <span class="na">AWSInstanceType2NATArch</span><span class="pi">:</span>
+    <span class="na">t1.micro</span><span class="pi">:</span>
+      <span class="na">Arch</span><span class="pi">:</span> <span class="s">NATHVM64</span>
+    <span class="na">t2.nano</span><span class="pi">:</span>
+      <span class="na">Arch</span><span class="pi">:</span> <span class="s">NATHVM64</span>
+    <span class="s">...</span>
+  <span class="na">AWSRegionArch2AMI</span><span class="pi">:</span>
+    <span class="na">us-east-1</span><span class="pi">:</span>
+      <span class="na">HVM64</span><span class="pi">:</span> <span class="s">ami-0080e4c5bc078760e</span>
+      <span class="na">HVMG2</span><span class="pi">:</span> <span class="s">ami-0aeb704d503081ea6</span>
+    <span class="s">...</span>
+</code></pre></div></div>
+<p>The mapping section is used to declare a mapping of instance types to their respective architectures and corresponding AMIs in each region. It is specifically used when creating instances within the template.</p>
+
+<h2 id="resources">Resources</h2>
+<h3 id="1vpc">1.VPC</h3>
+
+<p>To create a VPC, you only need to define a VPC resource, where the <code class="language-plaintext highlighter-rouge">Typ</code> is set to <code class="language-plaintext highlighter-rouge">AWS::EC2::VPC</code>. All resources must have a <code class="language-plaintext highlighter-rouge">Type</code> declared, which allows CloudFormation to identify the corresponding AWS resource to create. When creating resources in the AWS Management Console, you need to fill in the corresponding parameters for that resource. Similarly, when working with CloudFormation, you specify these parameters in the <code class="language-plaintext highlighter-rouge">Properties</code> section. Each type of resource will have different properties.</p>
+
+<p>To look up information about a specific resource, you can simply Google the resource name followed by ‘cloudformation’, which will lead you to the documentation page for that resource. For example, in this case, you can search for the <code class="language-plaintext highlighter-rouge">VPC CloudFormation</code> documentation
+<a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc.html" target="_blank">VPC CloudFormation</a></p>
+
+<p>Here are all the corresponding properties to declare a VPC resource in CloudFormation:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">Type</span><span class="pi">:</span> <span class="s">AWS::EC2::VPC</span>
+<span class="na">Properties</span><span class="pi">:</span>
+  <span class="na">CidrBlock</span><span class="pi">:</span> <span class="s">String</span>
+  <span class="na">EnableDnsHostnames</span><span class="pi">:</span> <span class="s">Boolean</span>
+  <span class="na">EnableDnsSupport</span><span class="pi">:</span> <span class="s">Boolean</span>
+  <span class="na">InstanceTenancy</span><span class="pi">:</span> <span class="s">String</span>
+  <span class="na">Tags</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">Tag</span>
+</code></pre></div></div>
+<p>Indeed, not all properties in the <code class="language-plaintext highlighter-rouge">Properties</code> section are mandatory. In the case of creating a simple VPC with just the <code class="language-plaintext highlighter-rouge">CidrBlock</code> set to <code class="language-plaintext highlighter-rouge">10.0.0.0/16</code>, it would look like this:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">Resources</span><span class="pi">:</span>
+  <span class="na">VPC</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::VPC'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">CidrBlock</span><span class="pi">:</span> <span class="s">10.0.0.0/16</span>
+</code></pre></div></div>
+
+<h3 id="2-subnet">2. Subnet</h3>
+<p>To create a public subnet, you can do it similarly to the VPC. Here’s an example:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">PublicSubnetA</span><span class="pi">:</span>
+  <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::Subnet'</span>
+  <span class="na">Properties</span><span class="pi">:</span>
+    <span class="na">VpcId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPC</span>
+    <span class="na">CidrBlock</span><span class="pi">:</span> <span class="s">10.0.0.0/24</span>
+    <span class="na">AvailabilityZone</span><span class="pi">:</span> <span class="s">us-east-1a</span>
+    <span class="na">MapPublicIpOnLaunch</span><span class="pi">:</span> <span class="no">true</span>
+</code></pre></div></div>
+<p>Here, intrinsic function <code class="language-plaintext highlighter-rouge">Ref</code> is used, and here’s how to use it:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// yml
+!Ref resource
+// JSON
+{ "Ref": resource },
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">Ref</code> can be used with parameters or logical resources declared in CloudFormation. When used with a parameter, it returns the value of the parameter, whereas when used with a resource, it returns the value of the resource, typically the physical ID.</p>
+
+<p>Above is a sample of a subnet, and the remaining subnets are created similarly, with only the corresponding <code class="language-plaintext highlighter-rouge">Properties</code> changed, just like when creating them manually through the AWS Management Console.</p>
+
+<h3 id="3-internet-gateway">3. Internet Gateway</h3>
+<p>The default VPC comes with an attached Internet Gateway. In this case, when creating a custom VPC, you need to create an Internet Gateway and attach it to the newly created VPC using CloudFormation as follows:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">VPCInternetGateway</span><span class="pi">:</span>
+  <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::InternetGateway'</span>
+<span class="na">VpcGatewayAttachment</span><span class="pi">:</span>
+  <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::VPCGatewayAttachment'</span>
+  <span class="na">Properties</span><span class="pi">:</span>
+    <span class="na">InternetGatewayId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPCInternetGateway</span>
+    <span class="na">VpcId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPC</span>
+</code></pre></div></div>
+
+<h3 id="4-route-table">4. Route Table</h3>
+<p>To facilitate management, we don’t consolidate all the rules into one route; instead, we divide them into corresponding route tables. In CloudFormation, you can achieve this by:</p>
+
+<p><strong>1.Creating a route table:</strong></p>
+
+<p>The template snippet below is used to create a route table for the public subnets.</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">PublicRT</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::RouteTable'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">VpcId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPC</span>
+</code></pre></div></div>
+
+<p><strong>2.Creating a route:</strong></p>
+
+<p>In the route table, there will be rules that map which destination networks go where. In this case, it’s a public route, so we will map all requests to the Internet Gateway</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">PublicRoute</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::Route'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">RouteTableId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">PublicRT</span>
+      <span class="na">DestinationCidrBlock</span><span class="pi">:</span> <span class="s">0.0.0.0/0</span>
+      <span class="na">GatewayId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPCInternetGateway</span>
+</code></pre></div></div>
+
+<p><strong>3.Associating the route table with the subnet:</strong></p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">PublicARouteAssociation</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::SubnetRouteTableAssociation'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">RouteTableId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">PublicRT</span>
+      <span class="na">SubnetId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">PublicSubnetA</span>
+</code></pre></div></div>
+
+<h3 id="5-nacl-network-access-control-list">5. NACL (Network Access Control List)</h3>
+<p>This part will include:</p>
+
+<p><strong>1.Creating a NACL:</strong></p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">NetworkAclPublic</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::NetworkAcl'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">VpcId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPC</span>
+</code></pre></div></div>
+<p><strong>2.Associating subnets with ACL</strong></p>
+
+<p>You need to create as many associations as the number of subnets you want to associate</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">SubnetNetworkAclAssociationPublicA</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::SubnetNetworkAclAssociation'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">NetworkAclId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">NetworkAclPublic</span>
+      <span class="na">SubnetId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">PublicSubnetA</span>
+</code></pre></div></div>
+
+<p><strong>3.Creating allow or deny rules for incoming traffic</strong></p>
+
+<p>In this case, it’s a public subnet, so we will allow all traffic</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">NetworkAclEntryPublicInAllowAll</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::NetworkAclEntry'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">NetworkAclId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">NetworkAclPublic</span>
+      <span class="na">RuleNumber</span><span class="pi">:</span> <span class="m">99</span>
+      <span class="na">Protocol</span><span class="pi">:</span> <span class="s">-1</span>
+      <span class="na">RuleAction</span><span class="pi">:</span> <span class="s">allow</span>
+      <span class="na">Egress</span><span class="pi">:</span> <span class="no">false</span>
+      <span class="na">CidrBlock</span><span class="pi">:</span> <span class="s">0.0.0.0/0</span>
+  <span class="na">NetworkAclEntryPublicOutAllowAll</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::NetworkAclEntry'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">NetworkAclId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">NetworkAclPublic</span>
+      <span class="na">RuleNumber</span><span class="pi">:</span> <span class="m">99</span>
+      <span class="na">Protocol</span><span class="pi">:</span> <span class="s">-1</span>
+      <span class="na">RuleAction</span><span class="pi">:</span> <span class="s">allow</span>
+      <span class="na">Egress</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">CidrBlock</span><span class="pi">:</span> <span class="s">0.0.0.0/0</span>
+</code></pre></div></div>
+
+<h3 id="6-creating-an-rds-cluster-and-rds-instance">6. Creating an RDS cluster and RDS instance</h3>
+
+<p><strong>1.Creating a subnet group</strong></p>
+
+<p>Before creating an RDS instance, it’s necessary to create a subnet group to ensure that the RDS instance is placed in the desired subnets. In this case, the RDS instance will reside in the private DB subnets</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">DBSubnetGroup</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::RDS::DBSubnetGroup'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">DBSubnetGroupName</span><span class="pi">:</span> <span class="s">rdssubnet</span>
+      <span class="na">DBSubnetGroupDescription</span><span class="pi">:</span> <span class="s">Private group subnet for db</span>
+      <span class="na">SubnetIds</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PrivateDBSubnetA</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PrivateDBSubnetB</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PrivateDBSubnetC</span>
+</code></pre></div></div>
+
+<p><strong>2. Creating a security group</strong></p>
+
+<p>Creating a security group that allows incoming traffic only from the instance’s security group</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">DBSecurityGroup</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::SecurityGroup'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">GroupDescription</span><span class="pi">:</span> <span class="s">Enable access to SQL connect</span>
+      <span class="na">VpcId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPC</span>
+      <span class="na">SecurityGroupIngress</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">IpProtocol</span><span class="pi">:</span> <span class="s">tcp</span>
+          <span class="na">FromPort</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3306'</span>
+          <span class="na">ToPort</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3306'</span>
+          <span class="na">SourceSecurityGroupId</span><span class="pi">:</span> <span class="kt">!GetAtt</span>
+            <span class="pi">-</span> <span class="s">InstanceSecurityGroup</span>
+            <span class="pi">-</span> <span class="s">GroupId</span>
+</code></pre></div></div>
+
+<p>Here, the intrinsic function <code class="language-plaintext highlighter-rouge">GetAtt</code> is used to retrieve attributes of a logical resource within the template. The syntax is as follows</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">// YAML</span>
+<span class="kt">!GetAtt</span>
+  <span class="pi">-</span> <span class="s">Logical resource name</span>
+  <span class="pi">-</span> <span class="s">Attribute</span>
+<span class="s">// JSON</span>
+<span class="pi">{</span><span class="s2">"</span><span class="s">Fn::GetAtt"</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">Logical</span><span class="nv"> </span><span class="s">resource</span><span class="nv"> </span><span class="s">name"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">Attribute"</span><span class="pi">]</span> <span class="pi">}</span>
+</code></pre></div></div>
+<p>The attributes that are supported for retrieval depend on the type of resource. In cases where there is no corresponding attribute, you may encounter an error when creating a stack from the template.</p>
+
+<p><strong>3.Creating an RDS cluster</strong></p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">DBCluster</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::RDS::DBCluster'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">Engine</span><span class="pi">:</span> <span class="s">aurora-mysql</span>
+      <span class="na">EngineVersion</span><span class="pi">:</span> <span class="s">5.7.mysql_aurora.2.04.7</span>
+      <span class="na">MasterUsername</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">DBUser</span>
+      <span class="na">MasterUserPassword</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">DBRootPassword</span>
+      <span class="na">DBSubnetGroupName</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">DBSubnetGroup</span>
+      <span class="na">VpcSecurityGroupIds</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="kt">!GetAtt</span>
+          <span class="pi">-</span> <span class="s">DBSecurityGroup</span>
+          <span class="pi">-</span> <span class="s">GroupId</span>
+</code></pre></div></div>
+<p>The username and password information is retrieved from parameters, while the subnet and security group information is obtained from the resources created earlier</p>
+
+<p><strong>4. Creating an RDS instance</strong></p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">DBInstance</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::RDS::DBInstance'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">DBClusterIdentifier</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">DBCluster</span>
+      <span class="na">DBInstanceClass</span><span class="pi">:</span> <span class="s">db.t2.medium</span>
+      <span class="na">Engine</span><span class="pi">:</span> <span class="s">aurora-mysql</span>
+</code></pre></div></div>
+
+<p>If you were creating this on the AWS Management Console, you would typically need to create an instance when creating a cluster. However, CloudFormation allows you to create the cluster first and then create the instance. The <code class="language-plaintext highlighter-rouge">DBInstanceClass</code> parameter is often specified using a parameter, but for simplicity, it can be fixed during creation</p>
+
+<h3 id="7-create-web-server-instance">7. Create web server instance</h3>
+
+<p>The idea is to create a server, install Ruby on it, generate a simple app, and then create an AMI from this server. This AMI will be used to create an auto-scaling group. Afterward, the instance will be stopped. The entire setup is done using cloud-init.
+To provide detailed information about this process would be lengthy, so I will skip it and provide a link to the template below.</p>
+
+<h3 id="8-create-a-ami">8. Create a AMI</h3>
+
+<p>Not all resources are supported by AWS directly, and in such cases, CloudFormation doesn’t natively support creating an AMI. This is where custom resources come into play. These resources are declared with a <code class="language-plaintext highlighter-rouge">Type</code> of <code class="language-plaintext highlighter-rouge">Custom::"Custom Resource Name"</code>. To create an AMI, you would need to create a custom resource and then use a Lambda function to create the AMI</p>
+
+<p><strong>1.Creating a custom resource for an AMI:</strong></p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">AMI</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Custom::AMI'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">ServiceToken</span><span class="pi">:</span> <span class="kt">!GetAtt</span>
+        <span class="pi">-</span> <span class="s">AMIFunction</span>
+        <span class="pi">-</span> <span class="s">Arn</span>
+      <span class="na">InstanceId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">WebServer</span>
+      <span class="na">ImageName</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">AMIName</span>
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">ServiceToken</code> is the only mandatory property in the <code class="language-plaintext highlighter-rouge">Properties</code> section. It represents the destination where CloudFormation sends the request. Below that, <code class="language-plaintext highlighter-rouge">InstanceId</code> and <code class="language-plaintext highlighter-rouge">ImageName</code> will be sent as part of the request.</p>
+
+<p><strong>2.Creating a role for Lambda</strong></p>
+
+<p>Create a role with the necessary policies to create a Lambda function</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">LambdaExecutionRole</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::IAM::Role'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">AssumeRolePolicyDocument</span><span class="pi">:</span>
+        <span class="na">Version</span><span class="pi">:</span> <span class="s">2012-10-17</span>
+        <span class="na">Statement</span><span class="pi">:</span>
+          <span class="na">Effect</span><span class="pi">:</span> <span class="s">Allow</span>
+          <span class="na">Principal</span><span class="pi">:</span>
+            <span class="na">Service</span><span class="pi">:</span>
+              <span class="pi">-</span> <span class="s">lambda.amazonaws.com</span>
+          <span class="na">Action</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s1">'</span><span class="s">sts:AssumeRole'</span>
+      <span class="na">Path</span><span class="pi">:</span> <span class="s">/</span>
+      <span class="na">ManagedPolicyArns</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s1">'</span><span class="s">arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'</span>
+        <span class="pi">-</span> <span class="s1">'</span><span class="s">arn:aws:iam::aws:policy/service-role/AWSLambdaRole'</span>
+      <span class="na">Policies</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">PolicyName</span><span class="pi">:</span> <span class="s">EC2Policy</span>
+          <span class="na">PolicyDocument</span><span class="pi">:</span>
+            <span class="na">Version</span><span class="pi">:</span> <span class="s">2012-10-17</span>
+            <span class="na">Statement</span><span class="pi">:</span>
+              <span class="pi">-</span> <span class="na">Effect</span><span class="pi">:</span> <span class="s">Allow</span>
+                <span class="na">Action</span><span class="pi">:</span>
+                  <span class="pi">-</span> <span class="s1">'</span><span class="s">ec2:DescribeInstances'</span>
+                  <span class="pi">-</span> <span class="s1">'</span><span class="s">ec2:DescribeImages'</span>
+                  <span class="pi">-</span> <span class="s1">'</span><span class="s">ec2:CreateImage'</span>
+                  <span class="pi">-</span> <span class="s1">'</span><span class="s">ec2:StopInstances'</span>
+                <span class="na">Resource</span><span class="pi">:</span>
+                  <span class="pi">-</span> <span class="s1">'</span><span class="s">*'</span>
+</code></pre></div></div>
+
+<p><strong>3. Create Lambda Function</strong></p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">AMIFunction</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::Lambda::Function'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">Handler</span><span class="pi">:</span> <span class="s">index.handler</span>
+      <span class="na">Role</span><span class="pi">:</span> <span class="kt">!GetAtt</span>
+        <span class="pi">-</span> <span class="s">LambdaExecutionRole</span>
+        <span class="pi">-</span> <span class="s">Arn</span>
+      <span class="na">Code</span><span class="pi">:</span>
+        <span class="na">ZipFile</span><span class="pi">:</span> <span class="kt">!Join</span>
+          <span class="pi">-</span> <span class="s">... function code</span>
+      <span class="na">Runtime</span><span class="pi">:</span> <span class="s">python3.8</span>
+      <span class="na">Timeout</span><span class="pi">:</span> <span class="s1">'</span><span class="s">900'</span>
+</code></pre></div></div>
+
+<p>Above, the Lambda function is created with the functionality to extract the instance ID from the request called to the custom resource. It then creates an AMI from that instance. Once the creation is complete, it sends back the AMI ID to the custom resource. This is achieved through cfn-response, and libraries for this can vary depending on the programming language used</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># require sdk and cfn-response lib
+</span><span class="kn">import</span> <span class="nn">cfnresponse</span>
+<span class="kn">import</span> <span class="nn">boto3</span>
+
+<span class="k">def</span> <span class="nf">handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+  <span class="c1"># Get information about instance
+</span>  <span class="n">ec2</span> <span class="o">=</span> <span class="n">boto3</span><span class="p">.</span><span class="n">resource</span><span class="p">(</span><span class="s">'ec2'</span><span class="p">)</span>
+  <span class="n">instance_id</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s">'ResourceProperties'</span><span class="p">][</span><span class="s">'InstanceId'</span><span class="p">]</span>
+  <span class="n">image_name</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s">'ResourceProperties'</span><span class="p">][</span><span class="s">'ImageName'</span><span class="p">]</span>
+  <span class="n">instance</span> <span class="o">=</span> <span class="n">ec2</span><span class="p">.</span><span class="n">Instance</span><span class="p">(</span><span class="n">instance_id</span><span class="p">)</span>
+
+  <span class="c1"># create image
+</span>  <span class="n">image</span> <span class="o">=</span> <span class="n">instance</span><span class="p">.</span><span class="n">create_image</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="n">image_name</span><span class="p">)</span>
+
+  <span class="c1"># resolved_image is write bellow but not showing here, it's wait until image creation complete and  send signal back to CloudFormation by using cfn-response:
+</span>  <span class="c1"># cfnresponse.send(event, context, cfnresponse.SUCCESS, {'image_id': image.id}, image.id)
+</span>  <span class="c1"># Usage of cfn-response: cfnresponse.send(event, context, status, data, physicalID)
+</span>  <span class="c1"># CloudFormation will wait until get signal or timeout
+</span>  <span class="n">resolved_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+  <span class="n">instance</span><span class="p">.</span><span class="n">stop</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h3 id="9-create-launch-configuration">9. Create Launch Configuration</h3>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">LaunchConfig</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::AutoScaling::LaunchConfiguration'</span>
+    <span class="na">DependsOn</span><span class="pi">:</span> <span class="s">AMI</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">ImageId</span><span class="pi">:</span> <span class="kt">!GetAtt</span>
+        <span class="pi">-</span> <span class="s">AMI</span>
+        <span class="pi">-</span> <span class="s">image_id</span>
+      <span class="na">KeyName</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">KeyName</span>
+      <span class="na">SecurityGroups</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">InstanceSecurityGroup</span>
+      <span class="na">InstanceType</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">InstanceType</span>
+      <span class="na">UserData</span><span class="pi">:</span> <span class="kt">!Base64</span>
+        <span class="s1">'</span><span class="s">Fn::Join'</span><span class="err">:</span>
+          <span class="pi">-</span> <span class="s1">'</span><span class="s">'</span>
+          <span class="pi">-</span> <span class="pi">-</span> <span class="pi">|</span>
+              <span class="s">#!/bin/bash -xe</span>
+            <span class="pi">-</span> <span class="pi">|</span>
+              <span class="s">yum update -y aws-cfn-bootstrap</span>
+            <span class="pi">-</span> <span class="s1">'</span><span class="s">/opt/aws/bin/cfn-signal</span><span class="nv"> </span><span class="s">-e</span><span class="nv"> </span><span class="s">0</span><span class="nv"> </span><span class="s">--stack</span><span class="nv"> </span><span class="s">'</span>
+            <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s1">'</span><span class="s">AWS::StackName'</span>
+            <span class="pi">-</span> <span class="s1">'</span><span class="nv"> </span><span class="s">--resource</span><span class="nv"> </span><span class="s">WebServerGroup</span><span class="nv"> </span><span class="s">'</span>
+            <span class="pi">-</span> <span class="s1">'</span><span class="nv"> </span><span class="s">--region</span><span class="nv"> </span><span class="s">'</span>
+            <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s1">'</span><span class="s">AWS::Region'</span>
+</code></pre></div></div>
+<p>Once the AMI is created, the Launch Configuration is then created. In the UserData section, cfn-signal is used to send a signal when the resource is created for the WebServerGroup, which will be discussed below</p>
+
+<h3 id="10-creating-an-alb-application-load-balancer-listener-and-target-group">10. Creating an ALB (Application Load Balancer), Listener, and Target Group</h3>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">ApplicationLoadBalancer</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::ElasticLoadBalancingV2::LoadBalancer'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">Subnets</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PublicSubnetA</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PublicSubnetB</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PublicSubnetC</span>
+      <span class="na">SecurityGroups</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">ALBSecurityGroup</span>
+  <span class="na">ALBListener</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::ElasticLoadBalancingV2::Listener'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">DefaultActions</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">Type</span><span class="pi">:</span> <span class="s">forward</span>
+          <span class="na">TargetGroupArn</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">ALBTargetGroup</span>
+      <span class="na">LoadBalancerArn</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">ApplicationLoadBalancer</span>
+      <span class="na">Port</span><span class="pi">:</span> <span class="s1">'</span><span class="s">80'</span>
+      <span class="na">Protocol</span><span class="pi">:</span> <span class="s">HTTP</span>
+  <span class="na">ALBTargetGroup</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::ElasticLoadBalancingV2::TargetGroup'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">HealthCheckIntervalSeconds</span><span class="pi">:</span> <span class="m">30</span>
+      <span class="na">HealthCheckTimeoutSeconds</span><span class="pi">:</span> <span class="m">5</span>
+      <span class="na">HealthyThresholdCount</span><span class="pi">:</span> <span class="m">3</span>
+      <span class="na">Port</span><span class="pi">:</span> <span class="m">80</span>
+      <span class="na">Protocol</span><span class="pi">:</span> <span class="s">HTTP</span>
+      <span class="na">UnhealthyThresholdCount</span><span class="pi">:</span> <span class="m">5</span>
+      <span class="na">VpcId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPC</span>
+</code></pre></div></div>
+<p>The snippet above creates an ALB, a Listener, and forwards HTTP traffic from the ALB to the Target Group, similar to when creating it through the AWS Management Console</p>
+
+<h3 id="11create-autoscaling">11.Create autoscaling</h3>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">WebServerGroup</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::AutoScaling::AutoScalingGroup'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">VPCZoneIdentifier</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PrivateSubnetA</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PrivateSubnetB</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PrivateSubnetC</span>
+      <span class="na">LaunchConfigurationName</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">LaunchConfig</span>
+      <span class="na">MinSize</span><span class="pi">:</span> <span class="s1">'</span><span class="s">2'</span>
+      <span class="na">MaxSize</span><span class="pi">:</span> <span class="s1">'</span><span class="s">2'</span>
+      <span class="na">TargetGroupARNs</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">ALBTargetGroup</span>
+      <span class="na">HealthCheckType</span><span class="pi">:</span> <span class="s">ELB</span>
+      <span class="na">HealthCheckGracePeriod</span><span class="pi">:</span> <span class="s1">'</span><span class="s">300'</span>
+    <span class="na">CreationPolicy</span><span class="pi">:</span>
+      <span class="na">ResourceSignal</span><span class="pi">:</span>
+        <span class="na">Timeout</span><span class="pi">:</span> <span class="s">PT15M</span>
+    <span class="na">UpdatePolicy</span><span class="pi">:</span>
+      <span class="na">AutoScalingRollingUpdate</span><span class="pi">:</span>
+        <span class="na">MinInstancesInService</span><span class="pi">:</span> <span class="s1">'</span><span class="s">1'</span>
+        <span class="na">MaxBatchSize</span><span class="pi">:</span> <span class="s1">'</span><span class="s">1'</span>
+        <span class="na">PauseTime</span><span class="pi">:</span> <span class="s">PT15M</span>
+</code></pre></div></div>
+
+<p>The AutoScaling Group is created using the Launch Configuration created earlier. The Launch Configuration includes the use of <code class="language-plaintext highlighter-rouge">cfn-signal</code> in user data because in the <code class="language-plaintext highlighter-rouge">WebServerGroup</code>, we use a <code class="language-plaintext highlighter-rouge">CreationPolicy</code>. This means that we want CloudFormation to wait until all the EC2 instances are successfully up and running before changing the resource’s status. The AutoScaling Group uses a Rolling Update Policy, which means that it replaces each instance in the group one at a time during updates</p>
+
+<p><a href="/sources/2024_01_14/autoscaling.yaml" target="_blank">Here</a> is the full template for reference</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/tags/#aws" class="page__taxonomy-item" rel="tag">aws</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#cloudformation" class="page__taxonomy-item" rel="tag">cloudformation</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#work" class="page__taxonomy-item" rel="tag">work</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2024-01-14T00:00:00+07:00">January 14, 2024</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Play+with+Cloud+Formation%20%2Fgetting-start-with-cf%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=%2Fgetting-start-with-cf%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=%2Fgetting-start-with-cf%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/build-happy-life/" class="pagination--pager" title="Xây dựng cuộc sống hạnh phúc
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+      <div class="page__comments">
+  
+  
+      <h4 class="page__comments-title">Leave a comment</h4>
+      <section id="disqus_thread"></section>
+    
+</div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You may also enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/build-happy-life/" rel="permalink">Xây dựng cuộc sống hạnh phúc
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime="2024-01-06T00:00:00+07:00">January 6 2024</time>
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Mình là người công giáo, mình vẫn nhớ như in câu giáo lí đầu tiên mình được học trước khi được xưng tội:
+
+
+  Hỏi: Ta sống ở đời này để làm gì? 
+Thưa: Ta sống...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/2023/" rel="permalink">2023
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime="2023-12-31T00:00:00+07:00">December 31 2023</time>
+
+
+
+
+  10 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Mình ngồi gõ những dòng này vào đúng 31-12, ngày cuối cùng của năm 2023. Mình nghĩ những ngày cuối năm luôn là thời điểm tốt để review lại những gì đã xảy ra...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/wishes/" rel="permalink">Thế giới của những ước muốn
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime="2023-10-29T00:00:00+07:00">October 29 2023</time>
+
+
+
+
+  6 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Còn nhớ ngày này năm ngoái mình còn đang đi healing ở trên Sóc Sơn, lần ấy đi vậy mà cũng vật vã lắm.
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/my-2022/" rel="permalink">Năm 2022 của tôi
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime="2023-01-23T00:00:00+07:00">January 23 2023</time>
+
+
+
+
+  7 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Để tóm tắt năm 2022 của mình trong 1 bức hình thì có lẽ đây là bức hình mà mình thấy phù hợp nhất:
+
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2024 Home. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M6CS1DM42V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-M6CS1DM42V', { 'anonymize_ip': false});
+</script>
+
+
+
+
+
+
+    
+  <script>
+    var disqus_config = function () {
+      this.page.url = "/getting-start-with-cf/";  /* Replace PAGE_URL with your page's canonical URL variable */
+      this.page.identifier = "/getting-start-with-cf"; /* Replace PAGE_IDENTIFIER with your page's unique identifier variable */
+    };
+    (function() { /* DON'T EDIT BELOW THIS LINE */
+      var d = document, s = d.createElement('script');
+      s.src = 'https://ninhle-dev.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+
+
+
+
+
+  </body>
+</html>

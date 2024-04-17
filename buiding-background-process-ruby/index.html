@@ -1,0 +1,821 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.19.1 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Xây dựng hệ thống xử lý background bằng ruby - Home</title>
+<meta name="description" content="1. Lợi ích của việc sử dụng background job Đối với ứng dụng viết bằng Rails, mỗi khi có request đến, webserver tiếp nhận request và trả về resoponse, tại sao chúng ta cần sử  dụng background? Bởi vì đối với những request cần phải tốn nhiều thời gian để xử lý như gửi email, import hay export với lượng data lớn, khi request được xử lý sẽ chặn các request khác, trong trường hợp xử lý quá lâu sẽ gây lỗi Timeout ảnh hưởng đến trải nghiệm người dùng. Để ứng dụng có thể hoạt động trơn chu, mượt mà hơn và ít bị người dùng chửi là web lởm vl 😬, người ta nghĩ ra cách cho những tác vụ này chạy trong nền. Ví dụ như việc xử  dụng chức năng export CSV, khi người dùng click vào nút export thì ta sẽ cho phần export và generate file chạy ngầm, khi chạy xong thì gửi file cho người dùng,thao tác của người dùng không bị gián đoạn. ">
+
+
+  <meta name="author" content="Cloud">
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Home">
+<meta property="og:title" content="Xây dựng hệ thống xử lý background bằng ruby">
+<meta property="og:url" content="/buiding-background-process-ruby/">
+
+
+  <meta property="og:description" content="1. Lợi ích của việc sử dụng background job Đối với ứng dụng viết bằng Rails, mỗi khi có request đến, webserver tiếp nhận request và trả về resoponse, tại sao chúng ta cần sử  dụng background? Bởi vì đối với những request cần phải tốn nhiều thời gian để xử lý như gửi email, import hay export với lượng data lớn, khi request được xử lý sẽ chặn các request khác, trong trường hợp xử lý quá lâu sẽ gây lỗi Timeout ảnh hưởng đến trải nghiệm người dùng. Để ứng dụng có thể hoạt động trơn chu, mượt mà hơn và ít bị người dùng chửi là web lởm vl 😬, người ta nghĩ ra cách cho những tác vụ này chạy trong nền. Ví dụ như việc xử  dụng chức năng export CSV, khi người dùng click vào nút export thì ta sẽ cho phần export và generate file chạy ngầm, khi chạy xong thì gửi file cho người dùng,thao tác của người dùng không bị gián đoạn. ">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2019-05-28T00:00:00+07:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="/buiding-background-process-ruby/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "",
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Home Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          Home
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/work">Work</a>
+            </li><li class="masthead__menu-item">
+              <a href="/personal">Personal</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/img/avatar.jpeg" alt="Cloud" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Cloud</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Just some boring stuff. <br />The place I document my journey.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+        
+          
+            <li><a href="mailto:ninhle.9984@gmail.com" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-envelope-square" aria-hidden="true"></i><span class="label">Email</span></a></li>
+          
+        
+          
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Xây dựng hệ thống xử lý background bằng ruby">
+    <meta itemprop="description" content="1. Lợi ích của việc sử dụng background jobĐối với ứng dụng viết bằng Rails, mỗi khi có request đến, webserver tiếp nhận request và trả về resoponse, tại sao chúng ta cần sử  dụng background? Bởi vì đối với những requestcần phải tốn nhiều thời gian để xử lý như gửi email, import hay export với lượng data lớn, khi request được xử lý sẽ chặn các request khác, trong trường hợp xử lý quá lâu sẽ gâylỗi Timeout ảnh hưởng đến trải nghiệm người dùng. Để ứng dụng có thể hoạt động trơn chu, mượt mà hơn và ít bị người dùng chửi là web lởm vl 😬, người ta nghĩ ra cách cho những tác vụnày chạy trong nền. Ví dụ như việc xử  dụng chức năng export CSV, khi người dùng click vào nút export thì ta sẽ cho phần export và generate file chạy ngầm, khi chạy xong thì gửi file cho ngườidùng,thao tác của người dùng không bị gián đoạn.">
+    <meta itemprop="datePublished" content="2019-05-28T00:00:00+07:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Xây dựng hệ thống xử lý background bằng ruby
+</h1>
+          
+            <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime=""></time>
+
+
+
+
+  7 minute read
+
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <h1 id="1-lợi-ích-của-việc-sử-dụng-background-job">1. Lợi ích của việc sử dụng background job</h1>
+<p>Đối với ứng dụng viết bằng Rails, mỗi khi có request đến, webserver tiếp nhận request và trả về resoponse, tại sao chúng ta cần sử  dụng background? Bởi vì đối với những request
+cần phải tốn nhiều thời gian để xử lý như gửi email, import hay export với lượng data lớn, khi request được xử lý sẽ chặn các request khác, trong trường hợp xử lý quá lâu sẽ gây
+lỗi Timeout ảnh hưởng đến trải nghiệm người dùng. Để ứng dụng có thể hoạt động trơn chu, mượt mà hơn và ít bị người dùng chửi là web lởm vl 😬, người ta nghĩ ra cách cho những tác vụ
+này chạy trong nền. Ví dụ như việc xử  dụng chức năng export CSV, khi người dùng click vào nút export thì ta sẽ cho phần export và generate file chạy ngầm, khi chạy xong thì gửi file cho người
+dùng,thao tác của người dùng không bị gián đoạn.</p>
+
+<p>Bản thân Rails có Active Job, có chức năng là lưu trử và thực hiện các job, nhưng để enqueuing và executing job ta cần sử dụng framework thứ 3:</p>
+<blockquote>
+  <p>For enqueuing and executing jobs in production you need to set up a queuing backend, that is to say you need to decide for a 3rd-party queuing library that Rails should use. Rails itself only provides an in-process queuing system, which only keeps the jobs in RAM. If the process crashes or the machine is reset, then all outstanding jobs are lost with the default async backend. This may be fine for smaller apps or non-critical jobs, but most production apps will need to pick a persistent backend.</p>
+</blockquote>
+
+<p>Rails có framework để thực hiện Background Job phổ biến như Sidekiq, Delay::Job, Sucker Punch, và những framework đó không nằm trong nội dung của bài viết này. 😁</p>
+
+<h1 id="2-xây-dựng-hệ-thống-xử-lý-background-bằng-ruby">2. Xây dựng hệ thống xử lý background bằng ruby</h1>
+
+<h3 id="extractitle-task">Extractitle Task</h3>
+
+<p>Giả sử ta có một list các website và phầ này ta xây dụng một task lần lượt lấy từng title từ url đó, bằng việc sử dụng OpenURI và Nokogiri:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'open-uri'</span>
+<span class="nb">require</span> <span class="s1">'nokogiri'</span>
+
+<span class="k">class</span> <span class="nc">TitleExtractService</span>
+  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">document</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">document</span><span class="p">.</span><span class="nf">css</span><span class="p">(</span><span class="s1">'html &gt; head &gt; title'</span><span class="p">).</span><span class="nf">first</span><span class="p">.</span><span class="nf">content</span>
+    <span class="nb">puts</span> <span class="n">title</span>
+  <span class="k">rescue</span>
+    <span class="nb">puts</span> <span class="s2">"Unable to open </span><span class="si">#{</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="no">TitleExtractService</span><span class="p">.</span><span class="nf">new</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="s2">"http://xem.vn"</span><span class="p">)</span>
+<span class="c1"># Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+</code></pre></div></div>
+
+<p>Refactor một chút bằng việc thêm module <code class="language-plaintext highlighter-rouge">Worker</code> vào trong Object Service như sau:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Extractor</span>
+  <span class="k">module</span> <span class="nn">Worker</span>
+     <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+       <span class="n">base</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">ClassMethods</span><span class="p">)</span>
+     <span class="k">end</span>
+
+     <span class="k">module</span> <span class="nn">ClassMethods</span>
+       <span class="k">def</span> <span class="nf">perform_now</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+         <span class="n">new</span><span class="p">.</span><span class="nf">perform</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+       <span class="k">end</span>
+     <span class="k">end</span>
+
+     <span class="k">def</span> <span class="nf">perform</span>
+       <span class="k">raise</span> <span class="no">NotImplementedError</span>
+     <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">TitleExtractWorker</span>
+  <span class="kp">include</span> <span class="no">Extractor</span><span class="o">::</span><span class="no">Worker</span>
+
+  <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">document</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">document</span><span class="p">.</span><span class="nf">css</span><span class="p">(</span><span class="s1">'html &gt; head &gt; title'</span><span class="p">).</span><span class="nf">first</span><span class="p">.</span><span class="nf">content</span>
+    <span class="nb">puts</span> <span class="n">title</span>
+  <span class="k">rescue</span>
+    <span class="nb">puts</span> <span class="s2">"Unable to open </span><span class="si">#{</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="no">TitleExtractService</span><span class="p">.</span><span class="nf">perform_now</span><span class="p">(</span><span class="s2">"http://xem.vn"</span><span class="p">)</span>
+<span class="c1"># Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che hai</span>
+</code></pre></div></div>
+
+<p>Giải thích một chút: ở đây ta tạo thêm <code class="language-plaintext highlighter-rouge">module Worker</code>, khi được include vào trong class, nhờ việc sử dụng method <code class="language-plaintext highlighter-rouge">included</code>, method trong <code class="language-plaintext highlighter-rouge">module ClassMethods</code> được <code class="language-plaintext highlighter-rouge">extend</code> cho <code class="language-plaintext highlighter-rouge">TitleExtractWorker</code>, khi đó ta có thể sử dụng method <code class="language-plaintext highlighter-rouge">perform_now</code>, nó sẽ tạo một <code class="language-plaintext highlighter-rouge">instance</code> và call method <code class="language-plaintext highlighter-rouge">peform</code> (trong có vẻ giống sidekiq 😉)</p>
+
+<h3 id="implementing-asynchronous-process">Implementing Asynchronous Process</h3>
+
+<p>Giả sử ta có một constant <code class="language-plaintext highlighter-rouge">Title</code> vơi list URL của các site cần phải lấy, mà list này từ đâu ra? Đối với người lười như mình thì dump lại cái URl nhiều lần có vẻ khả thi nhất  ☺️</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">SITE_URLS</span> <span class="o">=</span> <span class="no">Array</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"http://xem.vn"</span> <span class="p">}</span>
+
+<span class="no">SITE_URLS</span><span class="p">.</span><span class="nf">each_with_index</span> <span class="k">do</span> <span class="o">|</span><span class="n">url</span><span class="p">,</span> <span class="n">index</span><span class="o">|</span>
+  <span class="nb">puts</span> <span class="s2">"Numerical Order: </span><span class="si">#{</span><span class="n">index</span><span class="si">}</span><span class="s2">, </span><span class="si">#{</span><span class="no">TitleExtractWorker</span><span class="p">.</span><span class="nf">perform_now</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+<span class="k">end</span>
+
+<span class="c1"># Numerical Order: 0,</span>
+<span class="c1"># Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Numerical Order: 1,</span>
+<span class="c1"># Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Numerical Order: 2,</span>
+<span class="c1"># Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Numerical Order: 3,</span>
+<span class="c1"># ....</span>
+</code></pre></div></div>
+
+<p>Thanks God, it works 😂, nhưng điều kể đến ở đây là các việc các request được xử lý cách tuần tự, nghĩa là request sau phải chờ request trước hoàn thành rồi mới được thực thi.
+Để tăng tốc độ sử lý ta thêm method <code class="language-plaintext highlighter-rouge">perform_async</code> bằng cách tạo thêm <code class="language-plaintext highlighter-rouge">Thread</code> để xử lý cho mỗi URL.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Extractor</span>
+  <span class="k">module</span> <span class="nn">Worker</span>
+    <span class="k">module</span> <span class="nn">ClassMethods</span>
+      <span class="k">def</span> <span class="nf">perform_async</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="no">Thread</span><span class="p">.</span><span class="nf">new</span> <span class="k">do</span>
+          <span class="n">new</span><span class="p">.</span><span class="nf">perform</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Sau khi thay đổi bằng việc gọi <code class="language-plaintext highlighter-rouge">TitleExtractWorker.perform_now(url)</code>, ta thu được tất cả các Title tại một thời điểm, tuy nhiên để làm được điều đó ta gần như mở 10 connection request tại một thời điểm 😂. Với thay đổi như thế này ta có thể  gặp vấn đề  về giới hạn cả server của ta (việc mở nhiều Thread đồng thời yêu cầu khả năng xử lý và tốn memory) và Site mà ta đang access (có thể xử lý đồng thời nhiều một lúc như thế hay không)</p>
+
+<h3 id="queueing-task">Queueing Task</h3>
+<p>Để xử lý vẫn đề trên ta sử dụng <code class="language-plaintext highlighter-rouge">Producer–Consumer </code> pattern, bằng cách xử dụng một <code class="language-plaintext highlighter-rouge">Queue</code> trung gian, mỗi khi có task phía <code class="language-plaintext highlighter-rouge">Producer</code>  sẽ đấy task vào <code class="language-plaintext highlighter-rouge">Queue</code> và <code class="language-plaintext highlighter-rouge">Consumer</code> sẽ kéo task từ
+<code class="language-plaintext highlighter-rouge">Queue</code> về và xử lý.</p>
+
+<p><img src="/img/28_05_2019/consummer.png" alt="" /></p>
+
+<p>Ta thêm <code class="language-plaintext highlighter-rouge">Queue</code> như sau:</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Extractor</span>
+  <span class="k">module</span> <span class="nn">Worker</span>
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">queue</span>
+      <span class="vi">@queue</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">queue</span><span class="o">=</span><span class="p">(</span><span class="n">queue</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="no">Extractor</span><span class="o">::</span><span class="no">Worker</span><span class="p">.</span><span class="nf">queue</span> <span class="o">=</span> <span class="no">Queue</span><span class="p">.</span><span class="nf">new</span>
+</code></pre></div></div>
+<p>Và thay đổi method <code class="language-plaintext highlighter-rouge">perform_async</code>:</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">...</span>
+  <span class="k">def</span> <span class="nf">perform_async</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="no">Extractor</span><span class="o">::</span><span class="no">Worker</span><span class="p">.</span><span class="nf">queue</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="ss">worker: </span><span class="nb">self</span><span class="p">,</span> <span class="ss">args: </span><span class="n">args</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="o">...</span>
+</code></pre></div></div>
+
+<p>Đến phần tạo <code class="language-plaintext highlighter-rouge">Consummer</code>:</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Extractor</span>
+  <span class="k">class</span> <span class="nc">WorkerExcuting</span>
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">start</span><span class="p">(</span><span class="n">concurrency</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+      <span class="n">concurrency</span><span class="p">.</span><span class="nf">times</span> <span class="k">do</span> <span class="o">|</span><span class="n">n</span><span class="o">|</span>
+        <span class="n">new</span><span class="p">(</span><span class="s2">"Worker </span><span class="si">#{</span><span class="n">n</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+      <span class="n">thread</span> <span class="o">=</span> <span class="no">Thread</span><span class="p">.</span><span class="nf">new</span> <span class="k">do</span>
+        <span class="kp">loop</span> <span class="k">do</span>
+          <span class="n">payload</span> <span class="o">=</span> <span class="no">Extractor</span><span class="o">::</span><span class="no">Worker</span><span class="p">.</span><span class="nf">queue</span><span class="p">.</span><span class="nf">pop</span>
+          <span class="n">worker_class</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="ss">:worker</span><span class="p">]</span>
+          <span class="n">worker_class</span><span class="p">.</span><span class="nf">new</span><span class="p">.</span><span class="nf">perform</span><span class="p">(</span><span class="o">*</span><span class="n">payload</span><span class="p">[</span><span class="ss">:args</span><span class="p">])</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="n">thread</span><span class="p">.</span><span class="nf">name</span> <span class="o">=</span> <span class="nb">name</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<p>Ở phầ n này tùy thuộc vào số lượng <code class="language-plaintext highlighter-rouge">Thread</code> muốn thực hiện cách đồng thời mà ở khởi tạo ở phần <code class="language-plaintext highlighter-rouge">start</code>. Ta sử lại một chút method <code class="language-plaintext highlighter-rouge">perform</code> như sau:</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">document</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">document</span><span class="p">.</span><span class="nf">css</span><span class="p">(</span><span class="s1">'html &gt; head &gt; title'</span><span class="p">).</span><span class="nf">first</span><span class="p">.</span><span class="nf">content</span>
+    <span class="nb">puts</span> <span class="s2">"Current worker </span><span class="si">#{</span><span class="no">Thread</span><span class="p">.</span><span class="nf">current</span><span class="p">.</span><span class="nf">name</span><span class="si">}</span><span class="s2"> excute  </span><span class="si">#{</span><span class="n">title</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">rescue</span>
+    <span class="nb">puts</span> <span class="s2">"Unable to open </span><span class="si">#{</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+
+<span class="no">Extractor</span><span class="o">::</span><span class="no">WorkerExcuting</span><span class="p">.</span><span class="nf">start</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="c1"># Current worker Worker 0 excute  Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Current worker Worker 1 excute  Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Current worker Worker 2 excute  Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Current worker Worker 1 excute  Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Current worker Worker 3 excute  Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Current worker Worker 2 excute  Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+</code></pre></div></div>
+
+<h3 id="queueing-task-with-redis">Queueing Task With Redis</h3>
+<p>Thay vì sử dụng <code class="language-plaintext highlighter-rouge">Queue</code> implement bở <code class="language-plaintext highlighter-rouge">ruby</code> phần này ta sử dụng <code class="language-plaintext highlighter-rouge">Redis</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'redis'</span>
+<span class="nb">require</span> <span class="s1">'json'</span>
+<span class="k">module</span> <span class="nn">Extractor</span>
+  <span class="k">module</span> <span class="nn">Worker</span>
+    <span class="k">class</span> <span class="nc">Redis</span>
+      <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">redis</span> <span class="o">=</span> <span class="o">::</span><span class="no">Redis</span><span class="p">.</span><span class="nf">new</span><span class="p">)</span>
+        <span class="vi">@redis</span> <span class="o">=</span> <span class="n">redis</span>
+      <span class="k">end</span>
+
+      <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+        <span class="vi">@redis</span><span class="p">.</span><span class="nf">rpush</span><span class="p">(</span><span class="s2">"extract_worker"</span><span class="p">,</span> <span class="no">JSON</span><span class="p">.</span><span class="nf">dump</span><span class="p">(</span><span class="n">job</span><span class="p">))</span>
+      <span class="k">end</span>
+
+      <span class="k">def</span> <span class="nf">pop</span>
+        <span class="n">_queue</span><span class="p">,</span> <span class="n">payload</span> <span class="o">=</span> <span class="vi">@redis</span><span class="p">.</span><span class="nf">blpop</span><span class="p">(</span><span class="s2">"extract_worker"</span><span class="p">)</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="no">JSON</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="ss">symbolize_names: </span><span class="kp">true</span><span class="p">)</span>
+        <span class="n">payload</span><span class="p">[</span><span class="ss">:worker</span><span class="p">]</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">const_get</span><span class="p">(</span><span class="n">payload</span><span class="p">[</span><span class="ss">:worker</span><span class="p">])</span>
+        <span class="n">payload</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="no">Extractor</span><span class="o">::</span><span class="no">Worker</span><span class="p">.</span><span class="nf">queue</span> <span class="o">=</span> <span class="no">Extractor</span><span class="o">::</span><span class="no">Worker</span><span class="o">::</span><span class="no">Redis</span><span class="p">.</span><span class="nf">new</span>
+</code></pre></div></div>
+
+<p>Redis không phân biết được Ruby Object nên ta parse thành dạng JSON trước khi lưu trữ lại bằng Redis bằng việc sử dụng method <code class="language-plaintext highlighter-rouge">rpush</code>. Ta lấy object từ Redis bằng việc sử dụng
+method <code class="language-plaintext highlighter-rouge">blpop</code>, khi Redis rỗng nó sẽ đợi cho tới khi có object có thể lấy được từ Redis, bằng cách này <code class="language-plaintext highlighter-rouge">Worker</code> cũng sẽ  chờ cho tới khi Queue có data để xử lý. Việc cuối cùng là chuyển
+<code class="language-plaintext highlighter-rouge">String</code> thành <code class="language-plaintext highlighter-rouge">Object Class</code> của Ruby khi đã fetch data từ Redis về. Để kiểm tra và chắc là <code class="language-plaintext highlighter-rouge">Worker</code> của mình hoạt động tốt, có thể mở terminal mới, add thêm job vào Redis queue và
+xem điều kì lạ xảy ra =))</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/tags/#background" class="page__taxonomy-item" rel="tag">background</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#ruby" class="page__taxonomy-item" rel="tag">ruby</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#work" class="page__taxonomy-item" rel="tag">work</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2019-05-28T00:00:00+07:00">May 28, 2019</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=X%C3%A2y+d%E1%BB%B1ng+h%E1%BB%87+th%E1%BB%91ng+x%E1%BB%AD+l%C3%BD+background+b%E1%BA%B1ng+ruby%20%2Fbuiding-background-process-ruby%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=%2Fbuiding-background-process-ruby%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=%2Fbuiding-background-process-ruby%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="#" class="pagination--pager disabled">Previous</a>
+    
+    
+      <a href="/v%C3%A0i-ghi-ch%C3%A9p-v%E1%BB%81-replace-js/" class="pagination--pager" title="Vài ghi chép về replace function JS
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+      <div class="page__comments">
+  
+  
+      <h4 class="page__comments-title">Leave a comment</h4>
+      <section id="disqus_thread"></section>
+    
+</div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You may also enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/getting-start-with-cf/" rel="permalink">Play with Cloud Formation
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime="2024-01-14T00:00:00+07:00">January 14 2024</time>
+
+
+
+
+  15 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">CloudFormation is a service provided by AWS to help users easily build, set up, and provision resources on AWS quickly, reducing the effort required for mana...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/build-happy-life/" rel="permalink">Xây dựng cuộc sống hạnh phúc
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime="2024-01-06T00:00:00+07:00">January 6 2024</time>
+
+
+
+
+  8 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Mình là người công giáo, mình vẫn nhớ như in câu giáo lí đầu tiên mình được học trước khi được xưng tội:
+
+
+  Hỏi: Ta sống ở đời này để làm gì? 
+Thưa: Ta sống...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/2023/" rel="permalink">2023
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime="2023-12-31T00:00:00+07:00">December 31 2023</time>
+
+
+
+
+  10 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Mình ngồi gõ những dòng này vào đúng 31-12, ngày cuối cùng của năm 2023. Mình nghĩ những ngày cuối năm luôn là thời điểm tốt để review lại những gì đã xảy ra...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/wishes/" rel="permalink">Thế giới của những ước muốn
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+<time class="dt-published" datetime="2023-10-29T00:00:00+07:00">October 29 2023</time>
+
+
+
+
+  6 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Còn nhớ ngày này năm ngoái mình còn đang đi healing ở trên Sóc Sơn, lần ấy đi vậy mà cũng vật vã lắm.
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2024 Home. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M6CS1DM42V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-M6CS1DM42V', { 'anonymize_ip': false});
+</script>
+
+
+
+
+
+
+    
+  <script>
+    var disqus_config = function () {
+      this.page.url = "/buiding-background-process-ruby/";  /* Replace PAGE_URL with your page's canonical URL variable */
+      this.page.identifier = "/buiding-background-process-ruby"; /* Replace PAGE_IDENTIFIER with your page's unique identifier variable */
+    };
+    (function() { /* DON'T EDIT BELOW THIS LINE */
+      var d = document, s = d.createElement('script');
+      s.src = 'https://ninhle-dev.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,1304 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2024-04-17T19:25:22+07:00</updated><id>/feed.xml</id><title type="html">Home</title><subtitle>An amazing website.</subtitle><author><name>Cloud</name></author><entry><title type="html">Play with Cloud Formation</title><link href="/getting-start-with-cf/" rel="alternate" type="text/html" title="Play with Cloud Formation" /><published>2024-01-14T00:00:00+07:00</published><updated>2024-01-14T00:00:00+07:00</updated><id>/getting-start-with-cf</id><content type="html" xml:base="/getting-start-with-cf/"><![CDATA[<p>CloudFormation is a service provided by AWS to help users easily build, set up, and provision resources on AWS quickly, reducing the effort required for management. Using CloudFormation brings benefits such as:</p>
+
+<ul>
+  <li>Using it as an Infrastructure as Code (IaC) tool, where all AWS resources are managed through templates, making automation straightforward.</li>
+  <li>Facilitating the rapid provisioning of resources in an environment, which is inherently faster than manual human operations. Additionally, in case of a need for recovery, automation reduces the system’s Recovery Time Objective (RTO).
+Just imagine uploading the template, clicking a few buttons, and it’s done.</li>
+  <li>Minimizing human errors because everything is automated.</li>
+  <li>Serving as documentation and can be used with management tools like source control to make system management on AWS more straightforward.</li>
+</ul>
+
+<h2 id="using-cloudformation-on-the-aws-console">Using CloudFormation on the AWS console</h2>
+
+<p>From the AWS console, go to Service, select CloudFormation, then click on Create Stack, and choose With new resources.
+<img src="/img/14_01_2024/console.png" alt="" /></p>
+
+<p>Here, there are three options for creation:</p>
+<ul>
+  <li>Template is ready: Use when you already have a template ready. You can either upload a file directly from your local machine or provide the URL of a file saved on S3.</li>
+  <li>Use a sample template: Use a template provided by AWS.</li>
+  <li>Create template in Designer: This is a useful tool for building templates. It allows you to visually examine the current system, validate templates, and convert between YAML and JSON template formats.
+<img src="/img/14_01_2024/designer.png" alt="" /></li>
+</ul>
+
+<h2 id="template-components">Template Components</h2>
+<p>A CloudFormation template can be written in two formats: JSON and YAML. Compared to JSON, YAML is more concise and also supports comments. A complete CloudFormation template will include the following components:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">AWSTemplateFormatVersion</span><span class="pi">:</span>
+<span class="na">Description</span><span class="pi">:</span>
+<span class="na">Parameters</span><span class="pi">:</span>
+<span class="na">Mappings</span><span class="pi">:</span>
+<span class="na">Resources</span><span class="pi">:</span>
+<span class="na">Outputs</span><span class="pi">:</span>
+</code></pre></div></div>
+<ul>
+  <li>AWSTemplateFormatVersion: Specifies the version for the template. If this component is not specified in the template, CloudFormation will automatically use the latest version. Currently, the latest version is ‘2010-09-09’, which is also the only valid value.</li>
+  <li>Description: Allows you to add comments to explain the template.</li>
+  <li>Parameters: Allows you to pass custom parameters when creating the template. When creating it through the console, there will be a step to select these parameters.
+<img src="/img/14_01_2024/paramter.png" alt="" /></li>
+  <li>Mappings: Used to create a key-value mapping, which is used to retrieve corresponding values for specified keys when needed by using the intrinsic function <code class="language-plaintext highlighter-rouge">Fn::FindInMap</code></li>
+  <li>Resources: This is a mandatory component of the template. Without it, the stack cannot be created. This section is used to declare the resources on the stack that need to be initialized.</li>
+  <li>Outputs: This section is used to declare values needed after the stack has been created. The values will be displayed in the Outputs section on the UI console. For example, when creating a load balancer after the resources are created, you may want to retrieve the DNS name of that load balancer for testing.</li>
+</ul>
+
+<h2 id="creating-a-stack-with-cloudformation">Creating a stack with CloudFormation</h2>
+<p>The template you plan to create in Designer may look like the following:
+<img src="/img/14_01_2024/scale.png" alt="" /></p>
+
+<p>The template above is used to create resources in the style of a bastion host jump box. The template includes the following resources:</p>
+<ul>
+  <li>Creates a custom VPC including: 3 public subnets, 3 app private subnets, and 3 db private subnets located in 3 different availability zones.</li>
+  <li>App instance group resides in the app private subnets, allowing only SSH traffic from the bastion host and HTTP traffic from the Load Balancer to enter.</li>
+  <li>The RDS database is placed in the db private subnet, allowing only SQL traffic to enter from a specified security group.</li>
+</ul>
+
+<h2 id="parameters-for-the-template">Parameters for the template</h2>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">Parameters</span><span class="pi">:</span>
+  <span class="na">AMIName</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s">String</span>
+    <span class="na">Description</span><span class="pi">:</span> <span class="s">Name for AMI creation</span>
+    <span class="na">ConstraintDescription</span><span class="pi">:</span> <span class="s">Name for image</span>
+    <span class="na">MinLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">6'</span>
+    <span class="na">MaxLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">64'</span>
+  <span class="na">DBName</span><span class="pi">:</span>
+    <span class="na">Default</span><span class="pi">:</span> <span class="s">MyDatabase</span>
+    <span class="na">Description</span><span class="pi">:</span> <span class="s">MySQL database name</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s">String</span>
+    <span class="na">MinLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">1'</span>
+    <span class="na">MaxLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">64'</span>
+  <span class="na">DBUser</span><span class="pi">:</span>
+    <span class="na">NoEcho</span><span class="pi">:</span> <span class="s1">'</span><span class="s">true'</span>
+    <span class="na">Description</span><span class="pi">:</span> <span class="s">Username for MySQL database access</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s">String</span>
+    <span class="na">MinLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">1'</span>
+    <span class="na">MaxLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">64'</span>
+    <span class="na">AllowedPattern</span><span class="pi">:</span> <span class="s1">'</span><span class="s">[a-zA-Z][a-zA-Z0-9]*'</span>
+    <span class="na">ConstraintDescription</span><span class="pi">:</span> <span class="s">must begin with a letter and contain only alphanumeric characters</span>
+  <span class="na">DBRootPassword</span><span class="pi">:</span>
+    <span class="na">NoEcho</span><span class="pi">:</span> <span class="s1">'</span><span class="s">true'</span>
+    <span class="na">Description</span><span class="pi">:</span> <span class="s">Password for mysql access</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s">String</span>
+    <span class="na">MinLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">8'</span>
+    <span class="na">MaxLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">41'</span>
+    <span class="na">AllowedPattern</span><span class="pi">:</span> <span class="s1">'</span><span class="s">[a-zA-Z0-9]*'</span>
+    <span class="na">ConstraintDescription</span><span class="pi">:</span> <span class="s">must contain only alphanumeric characters</span>
+  <span class="na">InstanceType</span><span class="pi">:</span>
+    <span class="na">Description</span><span class="pi">:</span> <span class="s">WebServer EC2 instance type</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s">String</span>
+    <span class="na">Default</span><span class="pi">:</span> <span class="s">t2.small</span>
+    <span class="na">AllowedValues</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">t1.micro</span>
+      <span class="pi">-</span> <span class="s">t2.nano</span>
+      <span class="pi">-</span> <span class="s">t2.micro</span>
+      <span class="pi">-</span> <span class="s">t2.small</span>
+      <span class="pi">-</span> <span class="s">t2.medium</span>
+      <span class="s">...</span>
+    <span class="na">ConstraintDescription</span><span class="pi">:</span> <span class="s">must be a valid EC2 instance type.</span>
+  <span class="na">KeyName</span><span class="pi">:</span>
+    <span class="na">Description</span><span class="pi">:</span> <span class="s">Name of an existing EC2 KeyPair to enable SSH access to the instances</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::KeyPair::KeyName'</span>
+    <span class="na">ConstraintDescription</span><span class="pi">:</span> <span class="s">must be the name of an existing EC2 KeyPair.</span>
+  <span class="na">SSHLocation</span><span class="pi">:</span>
+    <span class="na">Description</span><span class="pi">:</span> <span class="s">The IP address range that can be used to SSH to the EC2 instances</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s">String</span>
+    <span class="na">MinLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">9'</span>
+    <span class="na">MaxLength</span><span class="pi">:</span> <span class="s1">'</span><span class="s">18'</span>
+    <span class="na">Default</span><span class="pi">:</span> <span class="s">0.0.0.0/0</span>
+    <span class="na">AllowedPattern</span><span class="pi">:</span> <span class="s1">'</span><span class="s">(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'</span>
+    <span class="na">ConstraintDescription</span><span class="pi">:</span> <span class="s">must be a valid IP CIDR range of the form x.x.x.x/x.</span>
+</code></pre></div></div>
+<p>The parameters used in the template include:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">AMIName</code>: Used to name the image when creating an AMI for updating the Launch Configuration.</li>
+  <li><code class="language-plaintext highlighter-rouge">DBUser</code>, <code class="language-plaintext highlighter-rouge">DBName</code>, <code class="language-plaintext highlighter-rouge">DBRootPassword</code>: Used to create the RDS database.</li>
+  <li><code class="language-plaintext highlighter-rouge">KeyName</code>: Specifies the key when using SSH to create an EC2 instance.</li>
+  <li><code class="language-plaintext highlighter-rouge">SSHLocation</code>: Specifies the source IP allowed to SSH into the instance.</li>
+</ul>
+
+<p>The structure of a parameter is as follows, with the properties used for the parameters mentioned above:</p>
+<ul>
+  <li>Parameter Name</li>
+  <li>Description: Description of the parameter.</li>
+  <li>Type: Type of the parameter. CloudFormation supports various types such as String, Number, List<Number>, and also allows listing other AWS resources like AWS::EC2::KeyPair::KeyName (keypair), ListAWS::EC2::VPC::Id (list of VPCs), ListAWS::EC2::SecurityGroup::Id (list of security groups), etc.</Number></li>
+  <li>Min, MaxLength: Limits on the number of characters for the parameter.</li>
+  <li>Default: Default value of the parameter.</li>
+  <li>AllowedPattern: Allows specifying a pattern, like a regex, to ensure that the parameter’s data conforms to that pattern.</li>
+  <li>NoEcho: Similar to a password field in an HTML form, setting it to true means the value of the field will not be displayed in the UI but will be hidden.</li>
+</ul>
+
+<h2 id="maping">Maping</h2>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">Mappings</span><span class="pi">:</span>
+  <span class="na">AWSInstanceType2Arch</span><span class="pi">:</span>
+    <span class="na">t1.micro</span><span class="pi">:</span>
+      <span class="na">Arch</span><span class="pi">:</span> <span class="s">HVM64</span>
+    <span class="na">t2.nano</span><span class="pi">:</span>
+      <span class="na">Arch</span><span class="pi">:</span> <span class="s">HVM64</span>
+    <span class="s">...</span>
+  <span class="na">AWSInstanceType2NATArch</span><span class="pi">:</span>
+    <span class="na">t1.micro</span><span class="pi">:</span>
+      <span class="na">Arch</span><span class="pi">:</span> <span class="s">NATHVM64</span>
+    <span class="na">t2.nano</span><span class="pi">:</span>
+      <span class="na">Arch</span><span class="pi">:</span> <span class="s">NATHVM64</span>
+    <span class="s">...</span>
+  <span class="na">AWSRegionArch2AMI</span><span class="pi">:</span>
+    <span class="na">us-east-1</span><span class="pi">:</span>
+      <span class="na">HVM64</span><span class="pi">:</span> <span class="s">ami-0080e4c5bc078760e</span>
+      <span class="na">HVMG2</span><span class="pi">:</span> <span class="s">ami-0aeb704d503081ea6</span>
+    <span class="s">...</span>
+</code></pre></div></div>
+<p>The mapping section is used to declare a mapping of instance types to their respective architectures and corresponding AMIs in each region. It is specifically used when creating instances within the template.</p>
+
+<h2 id="resources">Resources</h2>
+<h3 id="1vpc">1.VPC</h3>
+
+<p>To create a VPC, you only need to define a VPC resource, where the <code class="language-plaintext highlighter-rouge">Typ</code> is set to <code class="language-plaintext highlighter-rouge">AWS::EC2::VPC</code>. All resources must have a <code class="language-plaintext highlighter-rouge">Type</code> declared, which allows CloudFormation to identify the corresponding AWS resource to create. When creating resources in the AWS Management Console, you need to fill in the corresponding parameters for that resource. Similarly, when working with CloudFormation, you specify these parameters in the <code class="language-plaintext highlighter-rouge">Properties</code> section. Each type of resource will have different properties.</p>
+
+<p>To look up information about a specific resource, you can simply Google the resource name followed by ‘cloudformation’, which will lead you to the documentation page for that resource. For example, in this case, you can search for the <code class="language-plaintext highlighter-rouge">VPC CloudFormation</code> documentation
+<a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc.html" target="_blank">VPC CloudFormation</a></p>
+
+<p>Here are all the corresponding properties to declare a VPC resource in CloudFormation:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">Type</span><span class="pi">:</span> <span class="s">AWS::EC2::VPC</span>
+<span class="na">Properties</span><span class="pi">:</span>
+  <span class="na">CidrBlock</span><span class="pi">:</span> <span class="s">String</span>
+  <span class="na">EnableDnsHostnames</span><span class="pi">:</span> <span class="s">Boolean</span>
+  <span class="na">EnableDnsSupport</span><span class="pi">:</span> <span class="s">Boolean</span>
+  <span class="na">InstanceTenancy</span><span class="pi">:</span> <span class="s">String</span>
+  <span class="na">Tags</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">Tag</span>
+</code></pre></div></div>
+<p>Indeed, not all properties in the <code class="language-plaintext highlighter-rouge">Properties</code> section are mandatory. In the case of creating a simple VPC with just the <code class="language-plaintext highlighter-rouge">CidrBlock</code> set to <code class="language-plaintext highlighter-rouge">10.0.0.0/16</code>, it would look like this:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">Resources</span><span class="pi">:</span>
+  <span class="na">VPC</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::VPC'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">CidrBlock</span><span class="pi">:</span> <span class="s">10.0.0.0/16</span>
+</code></pre></div></div>
+
+<h3 id="2-subnet">2. Subnet</h3>
+<p>To create a public subnet, you can do it similarly to the VPC. Here’s an example:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">PublicSubnetA</span><span class="pi">:</span>
+  <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::Subnet'</span>
+  <span class="na">Properties</span><span class="pi">:</span>
+    <span class="na">VpcId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPC</span>
+    <span class="na">CidrBlock</span><span class="pi">:</span> <span class="s">10.0.0.0/24</span>
+    <span class="na">AvailabilityZone</span><span class="pi">:</span> <span class="s">us-east-1a</span>
+    <span class="na">MapPublicIpOnLaunch</span><span class="pi">:</span> <span class="no">true</span>
+</code></pre></div></div>
+<p>Here, intrinsic function <code class="language-plaintext highlighter-rouge">Ref</code> is used, and here’s how to use it:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// yml
+!Ref resource
+// JSON
+{ "Ref": resource },
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">Ref</code> can be used with parameters or logical resources declared in CloudFormation. When used with a parameter, it returns the value of the parameter, whereas when used with a resource, it returns the value of the resource, typically the physical ID.</p>
+
+<p>Above is a sample of a subnet, and the remaining subnets are created similarly, with only the corresponding <code class="language-plaintext highlighter-rouge">Properties</code> changed, just like when creating them manually through the AWS Management Console.</p>
+
+<h3 id="3-internet-gateway">3. Internet Gateway</h3>
+<p>The default VPC comes with an attached Internet Gateway. In this case, when creating a custom VPC, you need to create an Internet Gateway and attach it to the newly created VPC using CloudFormation as follows:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">VPCInternetGateway</span><span class="pi">:</span>
+  <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::InternetGateway'</span>
+<span class="na">VpcGatewayAttachment</span><span class="pi">:</span>
+  <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::VPCGatewayAttachment'</span>
+  <span class="na">Properties</span><span class="pi">:</span>
+    <span class="na">InternetGatewayId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPCInternetGateway</span>
+    <span class="na">VpcId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPC</span>
+</code></pre></div></div>
+
+<h3 id="4-route-table">4. Route Table</h3>
+<p>To facilitate management, we don’t consolidate all the rules into one route; instead, we divide them into corresponding route tables. In CloudFormation, you can achieve this by:</p>
+
+<p><strong>1.Creating a route table:</strong></p>
+
+<p>The template snippet below is used to create a route table for the public subnets.</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">PublicRT</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::RouteTable'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">VpcId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPC</span>
+</code></pre></div></div>
+
+<p><strong>2.Creating a route:</strong></p>
+
+<p>In the route table, there will be rules that map which destination networks go where. In this case, it’s a public route, so we will map all requests to the Internet Gateway</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">PublicRoute</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::Route'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">RouteTableId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">PublicRT</span>
+      <span class="na">DestinationCidrBlock</span><span class="pi">:</span> <span class="s">0.0.0.0/0</span>
+      <span class="na">GatewayId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPCInternetGateway</span>
+</code></pre></div></div>
+
+<p><strong>3.Associating the route table with the subnet:</strong></p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">PublicARouteAssociation</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::SubnetRouteTableAssociation'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">RouteTableId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">PublicRT</span>
+      <span class="na">SubnetId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">PublicSubnetA</span>
+</code></pre></div></div>
+
+<h3 id="5-nacl-network-access-control-list">5. NACL (Network Access Control List)</h3>
+<p>This part will include:</p>
+
+<p><strong>1.Creating a NACL:</strong></p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">NetworkAclPublic</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::NetworkAcl'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">VpcId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPC</span>
+</code></pre></div></div>
+<p><strong>2.Associating subnets with ACL</strong></p>
+
+<p>You need to create as many associations as the number of subnets you want to associate</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">SubnetNetworkAclAssociationPublicA</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::SubnetNetworkAclAssociation'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">NetworkAclId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">NetworkAclPublic</span>
+      <span class="na">SubnetId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">PublicSubnetA</span>
+</code></pre></div></div>
+
+<p><strong>3.Creating allow or deny rules for incoming traffic</strong></p>
+
+<p>In this case, it’s a public subnet, so we will allow all traffic</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">NetworkAclEntryPublicInAllowAll</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::NetworkAclEntry'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">NetworkAclId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">NetworkAclPublic</span>
+      <span class="na">RuleNumber</span><span class="pi">:</span> <span class="m">99</span>
+      <span class="na">Protocol</span><span class="pi">:</span> <span class="s">-1</span>
+      <span class="na">RuleAction</span><span class="pi">:</span> <span class="s">allow</span>
+      <span class="na">Egress</span><span class="pi">:</span> <span class="no">false</span>
+      <span class="na">CidrBlock</span><span class="pi">:</span> <span class="s">0.0.0.0/0</span>
+  <span class="na">NetworkAclEntryPublicOutAllowAll</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::NetworkAclEntry'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">NetworkAclId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">NetworkAclPublic</span>
+      <span class="na">RuleNumber</span><span class="pi">:</span> <span class="m">99</span>
+      <span class="na">Protocol</span><span class="pi">:</span> <span class="s">-1</span>
+      <span class="na">RuleAction</span><span class="pi">:</span> <span class="s">allow</span>
+      <span class="na">Egress</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">CidrBlock</span><span class="pi">:</span> <span class="s">0.0.0.0/0</span>
+</code></pre></div></div>
+
+<h3 id="6-creating-an-rds-cluster-and-rds-instance">6. Creating an RDS cluster and RDS instance</h3>
+
+<p><strong>1.Creating a subnet group</strong></p>
+
+<p>Before creating an RDS instance, it’s necessary to create a subnet group to ensure that the RDS instance is placed in the desired subnets. In this case, the RDS instance will reside in the private DB subnets</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">DBSubnetGroup</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::RDS::DBSubnetGroup'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">DBSubnetGroupName</span><span class="pi">:</span> <span class="s">rdssubnet</span>
+      <span class="na">DBSubnetGroupDescription</span><span class="pi">:</span> <span class="s">Private group subnet for db</span>
+      <span class="na">SubnetIds</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PrivateDBSubnetA</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PrivateDBSubnetB</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PrivateDBSubnetC</span>
+</code></pre></div></div>
+
+<p><strong>2. Creating a security group</strong></p>
+
+<p>Creating a security group that allows incoming traffic only from the instance’s security group</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">DBSecurityGroup</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::EC2::SecurityGroup'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">GroupDescription</span><span class="pi">:</span> <span class="s">Enable access to SQL connect</span>
+      <span class="na">VpcId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPC</span>
+      <span class="na">SecurityGroupIngress</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">IpProtocol</span><span class="pi">:</span> <span class="s">tcp</span>
+          <span class="na">FromPort</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3306'</span>
+          <span class="na">ToPort</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3306'</span>
+          <span class="na">SourceSecurityGroupId</span><span class="pi">:</span> <span class="kt">!GetAtt</span>
+            <span class="pi">-</span> <span class="s">InstanceSecurityGroup</span>
+            <span class="pi">-</span> <span class="s">GroupId</span>
+</code></pre></div></div>
+
+<p>Here, the intrinsic function <code class="language-plaintext highlighter-rouge">GetAtt</code> is used to retrieve attributes of a logical resource within the template. The syntax is as follows</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">// YAML</span>
+<span class="kt">!GetAtt</span>
+  <span class="pi">-</span> <span class="s">Logical resource name</span>
+  <span class="pi">-</span> <span class="s">Attribute</span>
+<span class="s">// JSON</span>
+<span class="pi">{</span><span class="s2">"</span><span class="s">Fn::GetAtt"</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">Logical</span><span class="nv"> </span><span class="s">resource</span><span class="nv"> </span><span class="s">name"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">Attribute"</span><span class="pi">]</span> <span class="pi">}</span>
+</code></pre></div></div>
+<p>The attributes that are supported for retrieval depend on the type of resource. In cases where there is no corresponding attribute, you may encounter an error when creating a stack from the template.</p>
+
+<p><strong>3.Creating an RDS cluster</strong></p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">DBCluster</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::RDS::DBCluster'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">Engine</span><span class="pi">:</span> <span class="s">aurora-mysql</span>
+      <span class="na">EngineVersion</span><span class="pi">:</span> <span class="s">5.7.mysql_aurora.2.04.7</span>
+      <span class="na">MasterUsername</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">DBUser</span>
+      <span class="na">MasterUserPassword</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">DBRootPassword</span>
+      <span class="na">DBSubnetGroupName</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">DBSubnetGroup</span>
+      <span class="na">VpcSecurityGroupIds</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="kt">!GetAtt</span>
+          <span class="pi">-</span> <span class="s">DBSecurityGroup</span>
+          <span class="pi">-</span> <span class="s">GroupId</span>
+</code></pre></div></div>
+<p>The username and password information is retrieved from parameters, while the subnet and security group information is obtained from the resources created earlier</p>
+
+<p><strong>4. Creating an RDS instance</strong></p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">DBInstance</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::RDS::DBInstance'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">DBClusterIdentifier</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">DBCluster</span>
+      <span class="na">DBInstanceClass</span><span class="pi">:</span> <span class="s">db.t2.medium</span>
+      <span class="na">Engine</span><span class="pi">:</span> <span class="s">aurora-mysql</span>
+</code></pre></div></div>
+
+<p>If you were creating this on the AWS Management Console, you would typically need to create an instance when creating a cluster. However, CloudFormation allows you to create the cluster first and then create the instance. The <code class="language-plaintext highlighter-rouge">DBInstanceClass</code> parameter is often specified using a parameter, but for simplicity, it can be fixed during creation</p>
+
+<h3 id="7-create-web-server-instance">7. Create web server instance</h3>
+
+<p>The idea is to create a server, install Ruby on it, generate a simple app, and then create an AMI from this server. This AMI will be used to create an auto-scaling group. Afterward, the instance will be stopped. The entire setup is done using cloud-init.
+To provide detailed information about this process would be lengthy, so I will skip it and provide a link to the template below.</p>
+
+<h3 id="8-create-a-ami">8. Create a AMI</h3>
+
+<p>Not all resources are supported by AWS directly, and in such cases, CloudFormation doesn’t natively support creating an AMI. This is where custom resources come into play. These resources are declared with a <code class="language-plaintext highlighter-rouge">Type</code> of <code class="language-plaintext highlighter-rouge">Custom::"Custom Resource Name"</code>. To create an AMI, you would need to create a custom resource and then use a Lambda function to create the AMI</p>
+
+<p><strong>1.Creating a custom resource for an AMI:</strong></p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">AMI</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Custom::AMI'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">ServiceToken</span><span class="pi">:</span> <span class="kt">!GetAtt</span>
+        <span class="pi">-</span> <span class="s">AMIFunction</span>
+        <span class="pi">-</span> <span class="s">Arn</span>
+      <span class="na">InstanceId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">WebServer</span>
+      <span class="na">ImageName</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">AMIName</span>
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">ServiceToken</code> is the only mandatory property in the <code class="language-plaintext highlighter-rouge">Properties</code> section. It represents the destination where CloudFormation sends the request. Below that, <code class="language-plaintext highlighter-rouge">InstanceId</code> and <code class="language-plaintext highlighter-rouge">ImageName</code> will be sent as part of the request.</p>
+
+<p><strong>2.Creating a role for Lambda</strong></p>
+
+<p>Create a role with the necessary policies to create a Lambda function</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">LambdaExecutionRole</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::IAM::Role'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">AssumeRolePolicyDocument</span><span class="pi">:</span>
+        <span class="na">Version</span><span class="pi">:</span> <span class="s">2012-10-17</span>
+        <span class="na">Statement</span><span class="pi">:</span>
+          <span class="na">Effect</span><span class="pi">:</span> <span class="s">Allow</span>
+          <span class="na">Principal</span><span class="pi">:</span>
+            <span class="na">Service</span><span class="pi">:</span>
+              <span class="pi">-</span> <span class="s">lambda.amazonaws.com</span>
+          <span class="na">Action</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s1">'</span><span class="s">sts:AssumeRole'</span>
+      <span class="na">Path</span><span class="pi">:</span> <span class="s">/</span>
+      <span class="na">ManagedPolicyArns</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s1">'</span><span class="s">arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'</span>
+        <span class="pi">-</span> <span class="s1">'</span><span class="s">arn:aws:iam::aws:policy/service-role/AWSLambdaRole'</span>
+      <span class="na">Policies</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">PolicyName</span><span class="pi">:</span> <span class="s">EC2Policy</span>
+          <span class="na">PolicyDocument</span><span class="pi">:</span>
+            <span class="na">Version</span><span class="pi">:</span> <span class="s">2012-10-17</span>
+            <span class="na">Statement</span><span class="pi">:</span>
+              <span class="pi">-</span> <span class="na">Effect</span><span class="pi">:</span> <span class="s">Allow</span>
+                <span class="na">Action</span><span class="pi">:</span>
+                  <span class="pi">-</span> <span class="s1">'</span><span class="s">ec2:DescribeInstances'</span>
+                  <span class="pi">-</span> <span class="s1">'</span><span class="s">ec2:DescribeImages'</span>
+                  <span class="pi">-</span> <span class="s1">'</span><span class="s">ec2:CreateImage'</span>
+                  <span class="pi">-</span> <span class="s1">'</span><span class="s">ec2:StopInstances'</span>
+                <span class="na">Resource</span><span class="pi">:</span>
+                  <span class="pi">-</span> <span class="s1">'</span><span class="s">*'</span>
+</code></pre></div></div>
+
+<p><strong>3. Create Lambda Function</strong></p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">AMIFunction</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::Lambda::Function'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">Handler</span><span class="pi">:</span> <span class="s">index.handler</span>
+      <span class="na">Role</span><span class="pi">:</span> <span class="kt">!GetAtt</span>
+        <span class="pi">-</span> <span class="s">LambdaExecutionRole</span>
+        <span class="pi">-</span> <span class="s">Arn</span>
+      <span class="na">Code</span><span class="pi">:</span>
+        <span class="na">ZipFile</span><span class="pi">:</span> <span class="kt">!Join</span>
+          <span class="pi">-</span> <span class="s">... function code</span>
+      <span class="na">Runtime</span><span class="pi">:</span> <span class="s">python3.8</span>
+      <span class="na">Timeout</span><span class="pi">:</span> <span class="s1">'</span><span class="s">900'</span>
+</code></pre></div></div>
+
+<p>Above, the Lambda function is created with the functionality to extract the instance ID from the request called to the custom resource. It then creates an AMI from that instance. Once the creation is complete, it sends back the AMI ID to the custom resource. This is achieved through cfn-response, and libraries for this can vary depending on the programming language used</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># require sdk and cfn-response lib
+</span><span class="kn">import</span> <span class="nn">cfnresponse</span>
+<span class="kn">import</span> <span class="nn">boto3</span>
+
+<span class="k">def</span> <span class="nf">handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+  <span class="c1"># Get information about instance
+</span>  <span class="n">ec2</span> <span class="o">=</span> <span class="n">boto3</span><span class="p">.</span><span class="n">resource</span><span class="p">(</span><span class="s">'ec2'</span><span class="p">)</span>
+  <span class="n">instance_id</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s">'ResourceProperties'</span><span class="p">][</span><span class="s">'InstanceId'</span><span class="p">]</span>
+  <span class="n">image_name</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s">'ResourceProperties'</span><span class="p">][</span><span class="s">'ImageName'</span><span class="p">]</span>
+  <span class="n">instance</span> <span class="o">=</span> <span class="n">ec2</span><span class="p">.</span><span class="n">Instance</span><span class="p">(</span><span class="n">instance_id</span><span class="p">)</span>
+
+  <span class="c1"># create image
+</span>  <span class="n">image</span> <span class="o">=</span> <span class="n">instance</span><span class="p">.</span><span class="n">create_image</span><span class="p">(</span><span class="n">Name</span><span class="o">=</span><span class="n">image_name</span><span class="p">)</span>
+
+  <span class="c1"># resolved_image is write bellow but not showing here, it's wait until image creation complete and  send signal back to CloudFormation by using cfn-response:
+</span>  <span class="c1"># cfnresponse.send(event, context, cfnresponse.SUCCESS, {'image_id': image.id}, image.id)
+</span>  <span class="c1"># Usage of cfn-response: cfnresponse.send(event, context, status, data, physicalID)
+</span>  <span class="c1"># CloudFormation will wait until get signal or timeout
+</span>  <span class="n">resolved_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+  <span class="n">instance</span><span class="p">.</span><span class="n">stop</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h3 id="9-create-launch-configuration">9. Create Launch Configuration</h3>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">LaunchConfig</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::AutoScaling::LaunchConfiguration'</span>
+    <span class="na">DependsOn</span><span class="pi">:</span> <span class="s">AMI</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">ImageId</span><span class="pi">:</span> <span class="kt">!GetAtt</span>
+        <span class="pi">-</span> <span class="s">AMI</span>
+        <span class="pi">-</span> <span class="s">image_id</span>
+      <span class="na">KeyName</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">KeyName</span>
+      <span class="na">SecurityGroups</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">InstanceSecurityGroup</span>
+      <span class="na">InstanceType</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">InstanceType</span>
+      <span class="na">UserData</span><span class="pi">:</span> <span class="kt">!Base64</span>
+        <span class="s1">'</span><span class="s">Fn::Join'</span><span class="err">:</span>
+          <span class="pi">-</span> <span class="s1">'</span><span class="s">'</span>
+          <span class="pi">-</span> <span class="pi">-</span> <span class="pi">|</span>
+              <span class="s">#!/bin/bash -xe</span>
+            <span class="pi">-</span> <span class="pi">|</span>
+              <span class="s">yum update -y aws-cfn-bootstrap</span>
+            <span class="pi">-</span> <span class="s1">'</span><span class="s">/opt/aws/bin/cfn-signal</span><span class="nv"> </span><span class="s">-e</span><span class="nv"> </span><span class="s">0</span><span class="nv"> </span><span class="s">--stack</span><span class="nv"> </span><span class="s">'</span>
+            <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s1">'</span><span class="s">AWS::StackName'</span>
+            <span class="pi">-</span> <span class="s1">'</span><span class="nv"> </span><span class="s">--resource</span><span class="nv"> </span><span class="s">WebServerGroup</span><span class="nv"> </span><span class="s">'</span>
+            <span class="pi">-</span> <span class="s1">'</span><span class="nv"> </span><span class="s">--region</span><span class="nv"> </span><span class="s">'</span>
+            <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s1">'</span><span class="s">AWS::Region'</span>
+</code></pre></div></div>
+<p>Once the AMI is created, the Launch Configuration is then created. In the UserData section, cfn-signal is used to send a signal when the resource is created for the WebServerGroup, which will be discussed below</p>
+
+<h3 id="10-creating-an-alb-application-load-balancer-listener-and-target-group">10. Creating an ALB (Application Load Balancer), Listener, and Target Group</h3>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">ApplicationLoadBalancer</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::ElasticLoadBalancingV2::LoadBalancer'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">Subnets</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PublicSubnetA</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PublicSubnetB</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PublicSubnetC</span>
+      <span class="na">SecurityGroups</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">ALBSecurityGroup</span>
+  <span class="na">ALBListener</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::ElasticLoadBalancingV2::Listener'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">DefaultActions</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">Type</span><span class="pi">:</span> <span class="s">forward</span>
+          <span class="na">TargetGroupArn</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">ALBTargetGroup</span>
+      <span class="na">LoadBalancerArn</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">ApplicationLoadBalancer</span>
+      <span class="na">Port</span><span class="pi">:</span> <span class="s1">'</span><span class="s">80'</span>
+      <span class="na">Protocol</span><span class="pi">:</span> <span class="s">HTTP</span>
+  <span class="na">ALBTargetGroup</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::ElasticLoadBalancingV2::TargetGroup'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">HealthCheckIntervalSeconds</span><span class="pi">:</span> <span class="m">30</span>
+      <span class="na">HealthCheckTimeoutSeconds</span><span class="pi">:</span> <span class="m">5</span>
+      <span class="na">HealthyThresholdCount</span><span class="pi">:</span> <span class="m">3</span>
+      <span class="na">Port</span><span class="pi">:</span> <span class="m">80</span>
+      <span class="na">Protocol</span><span class="pi">:</span> <span class="s">HTTP</span>
+      <span class="na">UnhealthyThresholdCount</span><span class="pi">:</span> <span class="m">5</span>
+      <span class="na">VpcId</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">VPC</span>
+</code></pre></div></div>
+<p>The snippet above creates an ALB, a Listener, and forwards HTTP traffic from the ALB to the Target Group, similar to when creating it through the AWS Management Console</p>
+
+<h3 id="11create-autoscaling">11.Create autoscaling</h3>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">WebServerGroup</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s1">'</span><span class="s">AWS::AutoScaling::AutoScalingGroup'</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">VPCZoneIdentifier</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PrivateSubnetA</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PrivateSubnetB</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">PrivateSubnetC</span>
+      <span class="na">LaunchConfigurationName</span><span class="pi">:</span> <span class="kt">!Ref</span> <span class="s">LaunchConfig</span>
+      <span class="na">MinSize</span><span class="pi">:</span> <span class="s1">'</span><span class="s">2'</span>
+      <span class="na">MaxSize</span><span class="pi">:</span> <span class="s1">'</span><span class="s">2'</span>
+      <span class="na">TargetGroupARNs</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="kt">!Ref</span> <span class="s">ALBTargetGroup</span>
+      <span class="na">HealthCheckType</span><span class="pi">:</span> <span class="s">ELB</span>
+      <span class="na">HealthCheckGracePeriod</span><span class="pi">:</span> <span class="s1">'</span><span class="s">300'</span>
+    <span class="na">CreationPolicy</span><span class="pi">:</span>
+      <span class="na">ResourceSignal</span><span class="pi">:</span>
+        <span class="na">Timeout</span><span class="pi">:</span> <span class="s">PT15M</span>
+    <span class="na">UpdatePolicy</span><span class="pi">:</span>
+      <span class="na">AutoScalingRollingUpdate</span><span class="pi">:</span>
+        <span class="na">MinInstancesInService</span><span class="pi">:</span> <span class="s1">'</span><span class="s">1'</span>
+        <span class="na">MaxBatchSize</span><span class="pi">:</span> <span class="s1">'</span><span class="s">1'</span>
+        <span class="na">PauseTime</span><span class="pi">:</span> <span class="s">PT15M</span>
+</code></pre></div></div>
+
+<p>The AutoScaling Group is created using the Launch Configuration created earlier. The Launch Configuration includes the use of <code class="language-plaintext highlighter-rouge">cfn-signal</code> in user data because in the <code class="language-plaintext highlighter-rouge">WebServerGroup</code>, we use a <code class="language-plaintext highlighter-rouge">CreationPolicy</code>. This means that we want CloudFormation to wait until all the EC2 instances are successfully up and running before changing the resource’s status. The AutoScaling Group uses a Rolling Update Policy, which means that it replaces each instance in the group one at a time during updates</p>
+
+<p><a href="/sources/2024_01_14/autoscaling.yaml" target="_blank">Here</a> is the full template for reference</p>]]></content><author><name>Cloud</name></author><category term="work" /><category term="aws" /><category term="cloudformation" /><summary type="html"><![CDATA[CloudFormation is a service provided by AWS to help users easily build, set up, and provision resources on AWS quickly, reducing the effort required for management. Using CloudFormation brings benefits such as:]]></summary></entry><entry><title type="html">Xây dựng cuộc sống hạnh phúc</title><link href="/build-happy-life/" rel="alternate" type="text/html" title="Xây dựng cuộc sống hạnh phúc" /><published>2024-01-06T00:00:00+07:00</published><updated>2024-01-06T00:00:00+07:00</updated><id>/build-happy-life</id><content type="html" xml:base="/build-happy-life/"><![CDATA[<p>Mình là người công giáo, mình vẫn nhớ như in câu giáo lí đầu tiên mình được học trước khi được xưng tội:</p>
+<blockquote>
+
+  <p>Hỏi: Ta sống ở đời này để làm gì? <br />
+Thưa: Ta sống ở đời này để tìm hạnh phúc, và hạnh phúc đích thực chỉ nơi Thiên Chúa.</p>
+</blockquote>
+
+<p>Chúng ta được sinh ra, rồi mải miết chạy theo đủ thứ, vì nghĩ rằng đạt được rồi sẽ hạnh phúc. Nhưng cứ như trò chơi đuổi hình bắt bóng vậy, có những lúc đã gần tưởng
+đạt được tới rồi, nhưng hạnh phúc thì chẳng thấy đâu, chỉ có những khoái cảm nhất thời đến rồi lại đi. Chết đi rồi lên thiên đàng liệu có hạnh phúc không, nói thật mình cũng không biết, vì mình chưa được trải qua bao giờ. Mình còn chả có cái định nghĩa chính xác hạnh phúc là gì cơ, nhưng cứ giật tip tiêu đề thế, blog của mình mà.
+Chỉ là mình nghĩ có những cách sống nếu áp dụng thì cuộc sống sẽ dễ chịu hơn, tránh được đau khổ cũng là một cách hạnh phúc, nhưng thay vì tìm kiếm hạnh phúc, thì sự an nhiên tự tại, bình an không phải tốt hơn sao?</p>
+
+<h2 id="1-ngủ-đủ-giấc">1. Ngủ đủ giấc</h2>
+<p>Muốn làm gì thì làm, thân tâm trí phải khoẻ thì mới làm được, mà nhất là cái tâm, vì tâm mà không khoẻ thì lấy đâu ra bình an hạnh phúc được. Chẳng thế mà cụ Nguyễn Du có viết:</p>
+
+<blockquote>
+  <p>Cảnh nào cảnh chẳng đeo sầu <br />
+Người buồn cảnh có vui đâu bao giờ</p>
+</blockquote>
+
+<p>Thân và tâm thì không tách rời khỏi nhau, thân khoẻ thì tâm mới khoẻ được. Mà cái cách dễ nhất, không tốn một xu nào mà ai cũng có thể làm được đó là đi ngủ sớm và ngủ đúng giờ. Biết là tốt thế nhưng không phải ai cũng làm được, nhất là vào cái thời hiện đại này, người trẻ thì ngủ ngày cày đêm. Ngày đi làm việc thì lờ đờ, xong đến đêm thì tỉnh như sáo lại dành để lướt mạng xã hội, tiktok, chơi game, chat chit. Nhiều người sẽ biện hộ là: “Mình không phải là morning person, đồng hồ sinh học của mình làm việc tốt nhất về đêm, bla bla”. Mình cũng từng nghĩ bản thân mình như thế, cho đến khi ngồi nghĩ kĩ lại, hồi còn trẻ con mình cũng toàn đi ngủ sớm đấy thôi, chỉ là lớn lên buông thả nuông chiều cho thói hư xấu, khi đã quen rồi thì cơ thể nó cứ theo nhịp điệu đấy. Hơn nữa, mình chỉ hay thức khuya khi ở thành phố, có smart phone, internet, thời điểm mình tham gia khoá thiền, mình vẫn đi ngủ đều đặn vào 9h tối và dậy vào 4h sáng, mà cả ngày người vẫn khoẻ, hơn là thời điểm mình ngủ vào 1-2h sáng, hôm sau người cứ lờ đờ, dù là ngủ đủ 8 tiếng.</p>
+
+<h2 id="2-ăn-uống-lành-mạnh">2. Ăn uống lành mạnh</h2>
+<p>Có câu:</p>
+<blockquote>
+  <p>We Are What We Eat</p>
+</blockquote>
+
+<p>Những thứ mình ăn vào thật sự quan trọng. Nếu mình cứ ăn uống không lành mạnh thì chả mấy chốc là cơ thể mình sẽ bệnh, nhưng bệnh thì không thấy ngay, mà người trẻ thì khoẻ thì sức khoẻ tốt, nên cứ cậy mình mạnh mà ăn uống vô tội vạ. Nhưng không sớm thì muộn, khi sức khoẻ đi xuống, cơ thể không chịu được nữa thì bệnh sẽ biểu hiện ra ngay.</p>
+
+<p>Ăn uống đúng cách trước hết là tránh ăn thực phẩm không lành mạnh. Chỉ là theo kinh nghiệm cá nhân và quan sát trực tiếp từ thói quen của mình mà không dựa trên bất kì nghiên cứu khoa học nào:</p>
+<ul>
+  <li>Fastfood, đồ chiên rán: nên hạn chế ăn, nếu không thì đừng hỏi sao bạn tập mãi mà người không đẹp</li>
+  <li>Nước ngọt, đồ uống có ga: uống xong thì sướng cái mồm, nhưng có thể gây nghiện, tác hại thì mãi không giảm được cân, sâu xa hơn thì mình cũng chưa rõ.</li>
+  <li>Các loại thịt: mình nghĩ nên ăn chừng mực, chẳng hiểu sao mình dễ tin vào mấy cái chuyện tâm linh, nhất là sau hồi đọc xong bộ “Muôn kiếp nhân sinh”. Mình tin rằng con người vốn sinh ra không phải là loài ăn thịt, và chúng ta không cần ăn nhiều thịt nhưng các chuyên gia vẫn hay khuyên. Có một chuyện khá buồn cười là thằng em trai 7 tuổi của mình ở nhà, cho nó ăn thịt thì nó chê gớm không ăn xong mẹ phải đi mua đậu cho nó ăn.</li>
+</ul>
+
+<p>Ăn uống bên ngoài là để nuôi thân, chúng ta cũng cần biết cho tâm ăn uống đúng cách. Những thông tin, câu chuyện mà chúng ta tiếp xúc hằng ngày chính là thức ăn để nuôi tâm. Mà toàn cho tâm đọc báo lá cải, lướt tiktok thì đừng hỏi sao mình mãi không có bình an hạnh phúc.</p>
+
+<h2 id="3-tập-thể-dục">3. Tập thể dục</h2>
+<p>Chọn một môn thể thao phù hợp và duy trì luyện tập đều đặn là quan trọng. Đi bộ và chạy bộ là hai lựa chọn tuyệt vời vì chúng đơn giản, dễ thực hiện và không yêu cầu nhiều thiết bị - chỉ cần một đôi giày phù hợp. Điểm mạnh của hai hoạt động này là sự độc lập, không phụ thuộc vào người khác, và chỉ cần một không gian mở rộng là có thể thực hiện. Chúng không chỉ giúp cải thiện sức khỏe thể chất mà còn là phương pháp hiệu quả để giảm stress. Khi chạy bộ, cơ thể tiết ra dopamine, một loại hóa chất giúp cải thiện tâm trạng và mang lại cảm giác hạnh phúc. Do đó, việc duy trì hoạt động thể chất như đi bộ hoặc chạy bộ không chỉ tốt cho sức khỏe thể chất mà còn có lợi cho tinh thần.</p>
+
+<h2 id="4-sống-tối-giản">4. Sống tối giản</h2>
+<p>Áp dụng lối sống tối giản và biết đủ đầy có thể nâng cao chất lượng cuộc sống đáng kể. Tối giản không chỉ đơn thuần là giảm bớt vật chất mà còn bao gồm việc đơn giản hóa mối quan hệ và mục tiêu cá nhân. Qua việc loại bỏ những yếu tố không thiết yếu, chúng ta mở ra không gian và thời gian cho những điều thực sự quan trọng. Theo nguyên tắc 80/20, những yếu tố quan trọng này chiếm 80% giá trị trong cuộc sống của chúng ta, trong khi phần còn lại chỉ chiếm 20%. Do đó, tối giản giúp chúng ta tập trung vào những điều cốt lõi, từ đó đạt được nhiều hơn và cảm thấy hạnh phúc hơn, mặc dù điều này có vẻ buồn cười nhưng đúng thật đấy.</p>
+
+<h2 id="5-nuôi-dưỡng-các-sở-thích-cá-nhân">5. Nuôi dưỡng các sở thích cá nhân</h2>
+<p>Mỗi người đều có những sở thích riêng, và việc nuôi dưỡng chúng là một phần quan trọng trong việc tạo ra cuộc sống hạnh phúc. Có những sở thích đơn giản, không mấy tốn kém mà còn giúp con người ta phát triển.</p>
+
+<p>Với mình thì đó là đọc sách, mình có thể sống nhiều cuộc đời qua từng con chữ, tiếp cận với những tri thức mới, học hỏi kiến thức kinh nghiệm từ người đi trước để lại. Hay như năm vừa rồi là mình học guitar đệm hát, mình thấy vui khi tự ngồi đàn rồi hát vu vơ, dù mình hát dở đi chăng nữa. Đây là của riêng mình, còn nếu bạn thích mua sắm vô tội vạ, lên bar nhạc nhẽo sập sình thì mình chịu.</p>
+
+<h2 id="6-học-cách-chấp-nhận">6. Học cách chấp nhận</h2>
+<p>Sau cùng nếu bạn bị cuộc sống hấp diêm mà không thể làm gì đáp trả thì cách tốt nhất là nhắm mắt hưởng thụ. Chấp nhận ý mình ở đây là chấp nhận mọi sự việc như nó đang là, mà không gieo thêm bi kịch vào đời bạn nữa, chỉ nhìn nhận đúng như nó đang là thôi. Chúng ta có xu hướng tự dựng lên hàng trăm ngàn câu chuyện sau mỗi sự kiện không vừa ý xảy ra trong đời chúng ta, mỗi khi làm sai gì đó thì chúng ta nghĩ mình là kẻ vô dụng, mỗi khi bị người khác chỉ trích thì chúng ta nghĩ mình là kẻ thất bại. Thường thì chúng ta không bị khổ bởi bản thân sự việc, mà khổ vì câu chuyện tự dưng nên, rồi nằm ăn vạ như một nạn nhân ở trong chính câu chuyện đó. Chỉ cần ta chấp nhận, nhìn nhận đúng sự việc, không thêm thắt thái độ của mình vào đó, thì ta có khoảng trống để nhìn nhận lại mọi thứ, tìm cách giải quyết, và bước tiếp theo cần làm, bài học cần phải học. Không gây đau khổ cho chính mình cũng là một cách để sống hạnh phúc hơn.</p>
+
+<h2 id="lời-kết">Lời kết</h2>
+<p>Sau tất cả thì mình nghĩ chúng ta có duyên đến vời đời này để trải nghiệm và học hỏi điều gì đó. Hãy trân trọng từng khoảng khắc của hiện tại mình đang sống dù có điều gì bất như ý xảy ra trong đời đi chăng nữa.</p>
+
+<blockquote>
+  <p>Happiness is here and now <br />
+There is no way to happiness, happiness is the way <br />
+<small>Thích Nhất Hạnh</small></p>
+</blockquote>]]></content><author><name>Cloud</name></author><category term="random" /><summary type="html"><![CDATA[Mình là người công giáo, mình vẫn nhớ như in câu giáo lí đầu tiên mình được học trước khi được xưng tội: Hỏi: Ta sống ở đời này để làm gì? Thưa: Ta sống ở đời này để tìm hạnh phúc, và hạnh phúc đích thực chỉ nơi Thiên Chúa.]]></summary></entry><entry><title type="html">2023</title><link href="/2023/" rel="alternate" type="text/html" title="2023" /><published>2023-12-31T00:00:00+07:00</published><updated>2023-12-31T00:00:00+07:00</updated><id>/2023</id><content type="html" xml:base="/2023/"><![CDATA[<p>Mình ngồi gõ những dòng này vào đúng 31-12, ngày cuối cùng của năm 2023. Mình nghĩ những ngày cuối năm luôn là thời điểm tốt để review lại những gì đã xảy ra trong năm.
+Thời gian gần đây mình bắt đồng không còn tin vào trí nhớ của mình nữa, nên mình nảy ra ý tưởng ghi chép lại hằng năm, để lúc nào đó nhìn lại xem mỗi năm mình đã đi
+qua những gì, mình sợ mình lại quên mất. Hơn nữa mình tin vào câu nói của Steve Jobs:</p>
+
+<blockquote>
+  <p>You can’t connect the dots looking forward; you can only connect them looking backwards. So you have to trust that the dots will somehow connect in your future.</p>
+</blockquote>
+
+<h2 id="khoá-thiền-cuối-năm">Khoá thiền cuối năm</h2>
+
+<p>Mình không biết bắt đầu từ đâu, nên mình cứ viết theo thứ tự mình nhớ gần nhất vậy. Mình kết thúc khoá thiền 10 ngày và trở về vào hôm nay. Thoạt đầu mình cũng không
+nghĩ là mình sẽ lại đi thiền trong năm nay, vì thời điểm mình đăng kí chỉ cách ngày khoá thiền diễn ra 2 tuần, mình cũng chỉ vừa kịp báo xin nghỉ bên công ty, nhưng
+cũng may đúng đợt phía bên kia nghỉ lễ Giáng Sinh nên thời việc nghỉ cũng không ảnh hưởng gì nhiểu.</p>
+
+<p>Thời điểm cuối năm này mình nhận ra mình đã để mình xấu đi rất nhiều, tâm hồn mình thấy bệ rạc, mình tự gieo giắc những suy nghĩ không cần thiết rồi lại tự gây khổ
+cho chính mình. Từ thời điểm mình tham gia khoá thiền hồi năm ngoái, mình đã nhận được nhiều lợi lạc, nhưng vì mình đã không duy trì được đều đặn, cộng với không thực
+hành những điều đã được học vào trong cuộc sống, nên mình lại quay lại với những thói quen cũ.</p>
+
+<p>Lần này quay lại với khoá thiền, mình được củng cố hơn trong phương pháp, trong 10 ngày vừa qua mình mới thấy được tâm trí mình điên rồ đến mức nào, đi hết từ
+chỗ này sang chỗ khác, từ chuyện này sang chuyện khác, nó chả bao giờ chịu ở yên một chỗ, ở yên trong cái hiện tại, trước những gì đang xảy ra trước mắt này.
+Có vài chuyện vui vui so với lần trước như thế này, lần này mình không ngồi được liên tục 1 giờ liên tục như năm ngoái nữa, chả hiểu sao cứ được 30 phút là chân mình
+đã đau không chịu nổi, dù mình đã đổi cả thiền toạ và đổi thử mấy tư thế khác. Đến ngày thứ 5 thì mình bắt đầu bị ốm, nhưng triệu chứng rất không biểu hiện dồn dập vào
+cùng một ngày, ngày đầu mình đau họng, đến ngày thứ hai thì khỏi, sau đấy thì bị hắt hơi, xổ mũi, khỏi xong rồi đến bị ho, mà buồn cười nhất là bình thường thì không
+ho mấy, nhưng cứ đến giờ ngồi thiền 1 giờ là mình lại không nhịn được mà ho liên tục.</p>
+
+<p>Rồi thì chuyện ăn ngủ, được cái đi thiền lần nào nào cũng là ăn chay mà đồ ăn thì ngon, trước lúc lên mình đã tự nhủ là tranh thủ lên để giảm cân, thế mà mấy hôm đầu mình ko bịt được cái miệng
+mà ăn rõ nhiều. Cũng may là đo đồ chay hay sao, mà mình vẫn giảm được cân theo kì vọng. Còn về chuyện ngủ, lần nào cũng thế, lên đây là ngủ rõ ngon, lần trước mấy ngày sau mình còn bị
+trằn trọc không dám ngủ trưa, chứ lần này vẫn ngủ trưa bình thường mà tối ngủ vẫn ngon.
+<img src="/img/31_12_2023/IMG_0059.jpeg" alt="" /></p>
+<p align="center">
+  <small> Vẫn hơn cả kì vọng của mình</small>
+</p>
+
+<p>Từ ngày thứ 10 thì bọn mình được phép nói chuyện, tối qua nghe bạn phòng bên kể chuyện bạn ấy đang cố vượt qua căn bệnh trầm cảm như thế nào, rồi nghe những người
+anh đi trước, chính những người ấy đã trải qua căn bệnh ấy, mình thấy thật sự khâm phục những con người ấy. Mình thấy những khó khăn của mình chỉ là vấn đề bé tẹo
+so với những gì người khác đã phải trải qua. Mình còn thấy thêm một điểm, trầm cảm tuy là một căn bệnh nhưng nó lại cũng là một món quà cho những ai đã vượt
+qua được khỏi nó, mình cảm thấy ở họ có gì đó sâu sắc hơn. Mình còn thấy được thêm một thế giới, ngoài cái thế giới mà mình đang sống hằng ngày, người ta đua nhau
+bon chen, kiếm tiền, so sánh, lựa chọn cân đo đong đếm thì ở đâu đó ngoài kia có thế giới có những ngươi phục vụ vô tự ko vì lợi ích của mình mà chỉ vì lợi ích
+của người khác.</p>
+
+<p>Từ anh H, mình học được mấy điều:</p>
+
+<ul>
+  <li>Luôn để, gấp đồ đạc một cách gọn gàng cũng là một cách để giữ cho tâm trí luôn trong trạng thái gọn gàng.</li>
+  <li>Khi ăn thì hãy cố ăn thật chậm để cảm nhận không chỉ để cảm thấy ăn ngon miệng hơn, mà còn là một cách để mình cảm thấy biết ơn về những gì mình đang có,
+mình có những người phục vụ nấu cho bữa ăn này, mình còn may mắn hơn rất nhiều người khác trên thế giới đang ko có được một bữa ăn ngon đúng nghĩa.</li>
+  <li>Khi có người yêu, vào ngày lễ như 8/3 hay 20/10, thay vì đi ăn ở nhà hàng thì cùng nhau xuống đường, mua một bó hoa, rồi đem tặng lại cho chính những người bán hàng rong, những người lao công.
+<img src="/img/31_12_2023/1HIUOMQDU_A0BC79.jpeg" alt="" /></li>
+</ul>
+<p align="center">
+  <small> Ngày mình kết thúc khoá thiền, mặt ai cười cũng tươi</small>
+</p>
+
+<h2 id="về-công-việc">Về công việc</h2>
+<p>Thành thật mà nói để tóm tắt trong năm nay thì mình nghĩ có thể dùng “đủ sống sót” để miêu tả. Năm nay công ty mình có incident vào đúng ngày quan trọng nhất, kiểu cả cái app chỉ làm cho một ngày, nhưng ngày đấy thì app chết không lên được, mà ko có cách gì cứu được. Lần đầu tiên trong sự nghiệp đi làm mình chứng kiến nguyên một team bị layoff, dù chuyện xảy ra hoàn toàn không phải do lỗi của họ.
+Thành thật mà nhìn lại mình đã không dồn hết sức cho công việc, có những chuyện đáng lẽ mình có thể làm tốt hơn.</p>
+
+<h2 id="về-tài-chính">Về tài chính</h2>
+<p>Ngồi tổng kết lại, mình chỉ đạt được 90% target tiết kiệm đặt ra từ hồi đầu năm. Fail thì có nhiều lí do, nhưng tóm lại thì 3 phần là nguyên nhân chủ quan, 1 phần là nguyên nhân khách quan, đấy là nói giảm nói tránh, còn nói thật là tại mình tiêu hoang :sob:</p>
+
+<p>Ngày xưa đi đâu mình cũng bô bô cái mồm là em thấy mức sống của không đổi mấy so với hồi mới đi làm, ấy thế mà năm năm nay nếu tính trung bình tháng ra thì mình chi tiêu gấp 3 lần, đúng là nghiệp tụ vành môi. Năm nay mình mua sắm hơi nhiều, sau 5 năm đi nhờ con wave của bố thì mình cũng nghĩ lại là nên cho nó về hưu nên mình mua xe, với một phần nữa là mình hay về quê mà đi con wave tạt đầu xe tải thì ghê bỏ mẹ, nên thôi, đổi xe cho nó an toàn, có tiền thì cũng phải còn sống mới xài được tiền. Chưa kể là đổi máy tính, điện thoại, trước khi đổi mỗi cái mình đều áp dụng nguyên tắc là ngủ một giấc thật ngon, hôm sau dậy mà vẫn muốn mua thì mới chạy đi mua :sunglasses:. Thực ra đồ cũ của mình vẫn còn dùng tốt, vẫn có thể dùng thêm được vài năm, nhưng mình nghĩ thay đổi cũng cũng một phần để trải nghiệm và mình có điều kiện thì mình thì mình cứ làm thôi. Chưa kể mình cũng khá thoải mái trong chuyện mua sách vở, tài liệu khoá học, nếu là mình của 5 năm trước chắc phải ngồi suy nghĩ đủ thử rồi mới.</p>
+
+<p>Trên thanh minh một hồi thế thôi chứ tóm lại vẫn là tiêu hoang :(</p>
+
+<h2 id="học-hành">Học hành</h2>
+<p>Sau mấy năm mua đàn, đánh Sunflower không đến nơi đến chốn, thì năm vừa rồi mình đi học đệm hát với ông anh cùng công ty ở 88. Mình cũng đánh được mấy điệu cơ bản, nhưng mà vẫn là loại “Tôi ca không hay, tôi đàn nghe cũng dở”. Tự tập vu vơ thì được nhưng cứ thử dùng camera để quay, hay có người nghe thì mình không vấp chỗ nọ cũng vấp chỗ kia.
+<img src="/img/31_12_2023/IMG_0065.jpeg" alt="" /></p>
+<p align="center">
+  <small> Ảnh thẻ minishow của mình ở 88</small>
+</p>
+
+<p>Ở 88 mình cảm nhận được không khí cởi mở, gần gũi, thoải mái, có những con người đầy thú vị. Nếu được hỏi là còn điều gì mình muốn làm gì ở đây mà chưa làm được thì chắc là “qua đêm” với mọi người, ko tính minishow :v</p>
+
+<p><img src="/img/31_12_2023/IMG_1312.jpeg" alt="" /></p>
+<p align="center">
+  <small> Ảnh từ những thập niên trước</small>
+</p>
+
+<p><img src="/img/31_12_2023/IMG_1296.jpeg" alt="" /></p>
+<p align="center">
+  <small> Thầy trò đường tăng</small>
+</p>
+
+<h2 id="sức-khoẻ">Sức khoẻ</h2>
+<p>Năm nay mình khá ổn, 2 năm trước mình bị “dị ứng thời tiết”, cứ mỗi lần trời từ lạnh sang nóng hay nó nóng sang lạnh là lại bị hắt hơi, chảy nước mũi, đến độ có thời điềm mình ko ngủ được, năm nay thì chưa thấy bị lại nữa. Cũng lâu rồi mình chưa đi khám sức khoẻ định kì, năm nay định đi khám, nhưng nghĩ đi nghĩ lại, kiểu hay thôi không khám nữa cho an tâm, sợ nhỡ khám rồi lại ra bệnh.</p>
+
+<p>Mình đạt được target là chạy được cái half marathon, dù không phải là chính thức tham gia một giải chạy.</p>
+
+<p><img src="/img/31_12_2023/IMG_1356.jpeg" alt="" /></p>
+
+<p><img src="/img/31_12_2023/IMG_1388.jpeg" alt="" /></p>
+<p align="center">
+  <small> Trừ những lúc ăn uống không lành mạnh thì lúc nào mình cũng ăn uống lành mạnh</small>
+</p>
+
+<p>Con chó chị chủ nhà mình có một thời gian như bị trầm cảm, đợt này thấy nó có vẻ vui trở lại.
+<img src="/img/31_12_2023/ezgif.com-optimize.gif" alt="" /></p>
+
+<h2 id="vài-điều-linh-tinh-khác">Vài điều linh tinh khác</h2>
+<p>Có vài thứ linh tinh mình ghi chép lại, theo kiểu TIL mà mình phải tự học</p>
+<ul>
+  <li>Làm tất cả tốt nhất trong khả năng</li>
+  <li>Nếu thấy có gì đó sai, phải sửa ngay lập tức</li>
+  <li>Làm gì hay nói năng gì cũng phải có chánh niệm</li>
+  <li>Không có điều gì xấu xảy ra chính ra một điều tốt</li>
+  <li>Cuộc sống vốn rất manh mong, bạn có thể đánh mất nó trước khi bạn kịp nhận ra điều đó.</li>
+  <li>Cô đơn là trạng thái rảnh rỗi và thích drama cuộc đời của mình</li>
+</ul>
+
+<p>Mình cũng có vài dự định cho năm mới, nhưng năm nay mình ko viết nên trên này nữa, có gì mình sẽ viết lại vào post của năm sau.</p>
+
+<p>Đầu năm cũng chỉ mong một năm mới bình an và giữ được nụ cuối tấu hài như thằng em mình.
+<img src="/img/31_12_2023/IMG_0664.jpeg" alt="" /></p>]]></content><author><name>Cloud</name></author><category term="random" /><summary type="html"><![CDATA[Mình ngồi gõ những dòng này vào đúng 31-12, ngày cuối cùng của năm 2023. Mình nghĩ những ngày cuối năm luôn là thời điểm tốt để review lại những gì đã xảy ra trong năm. Thời gian gần đây mình bắt đồng không còn tin vào trí nhớ của mình nữa, nên mình nảy ra ý tưởng ghi chép lại hằng năm, để lúc nào đó nhìn lại xem mỗi năm mình đã đi qua những gì, mình sợ mình lại quên mất. Hơn nữa mình tin vào câu nói của Steve Jobs:]]></summary></entry><entry><title type="html">Thế giới của những ước muốn</title><link href="/wishes/" rel="alternate" type="text/html" title="Thế giới của những ước muốn" /><published>2023-10-29T00:00:00+07:00</published><updated>2023-10-29T00:00:00+07:00</updated><id>/wishes</id><content type="html" xml:base="/wishes/"><![CDATA[<p>Còn nhớ ngày này năm ngoái mình còn đang đi healing ở trên Sóc Sơn, lần ấy đi vậy mà cũng vật vã lắm.</p>
+
+<p>Mình cứ nghĩ là một đứa hướng nội “thuần chủng” như mình đi thì sẽ nhẹ
+nhàng cơ, ấy thế mà mấy ngày đầu cũng kiểu: “Ủa, ở nhà đang sướng tự nhiên rúc lên đây làm chi vậy.”. Từ việc phải dậy sớm đúng 4h30, đến việc phải giữ im lặng ko được
+nói chuyện với bất kì ai, rồi thì ngồi thiền cả ngày, mấy ngày đầu mình còn đau khắp cả người luôn. Rồi thì bao nhiêu thói quen hay dùng điện thoại, lướt internet
+thì giờ đây mình bị cắt hết kết nối với thế giới bên ngoài. Ấy thế mà mấy ngày sau đấy lại là mấy ngày mình cảm thấy thật nhẹ nhàng, thật thoải mái, thật yên bình. Nói thật
+là mình chưa có cảm giác “ngộ” giống mọi người hay kể, nhưng so với cái cảm xúc vật vã trước hồi đầu lên đấy thì lúc về cũng đỡ đi nhiều.</p>
+
+<p><img src="/img/29-10-2023/IMG_1006.jpeg" alt="" /></p>
+
+<p>Cũng nhờ 10 ngày đấy mà mình có cơ hội được học thiền Vipassana một cách bài bản, còn có thể ngồi im 1h đồng hồ liên tục mà ko cựa quậy hay nhúc nhích gì, hơi kì lạ
+là khi về nhà thì mình ko ngồi được lâu liên tục như vậy, với chân cũng nhanh bị tê hơn.</p>
+
+<p>Còn nhớ trong một bài pháp thoại buổi tối mình có nghe được câu chuyện với nội dung theo trí nhớ của mình như thế này:</p>
+
+<blockquote>
+  <p>Có 4 cậu bé, mỗi cậu bé được tặng một điều ước. Cậu bé thứ nhất ước có một que kem, cậu bé thứ hai chê cậu bé thứ nhất dại và ước có nguyên một
+nhà máy kem, như thế thì cậu có thể ăn kem thoả thích. Cậu bé thứ ba chê cậu bé thứ hai dại và cậu bé này này ước là mọi điều mà cậu ước sẽ trờ thành
+sự thật. Thế là cậu có thể thoải mái thoả mãn mọi ước muốn của cậu Đến lượt cậu bé thứ tư, thì cậu bé này chỉ ước là cậu sẽ chẳng còn một ước muốn nào nữa.</p>
+</blockquote>
+
+<p>Thoạt nhìn qua câu chuyện trên thì ta nghĩ cậu bé thứ ba là cậu bé thông minh và khôn ngoan nhất. Nhưng người chiến thắng cuối cùng thì lại là cậu bé thứ tư.</p>
+
+<p>Đời người nhiều khi cũng vậy, người ta cứ nghĩ phải đến được A, có bằng được A thì mới hạnh phúc. Nhưng đến khi có được A, được một thời gian
+người ta lại nghĩ rằng phải có được B thì mới là hạnh phúc, rồi người ta lại lao đầu ra theo đuổi B. Đến khi có được B, rồi người ta lại đi tìm X, Y, Z. Cả
+cuộc đời người, ta cứ lao đi như vậy nhưng chẳng bao giờ dừng lại và tự hỏi cái gì mới thật sự là hạnh phúc.</p>
+
+<p>Thế gian này quanh đi quẩn lại thì người ta cũng chỉ chạy theo 3 chữ danh - lợi - tình. Người ta nghĩ rằng phải có danh lợi, có tiền bạc, có người tình thì mới hạnh phúc
+được. Nhưng cũng chẳng thiếu những người có đủ những thứ đó mà họ vẫn thấy chẳng hạnh phúc. Mình còn nhớ đọc đâu trên mạng xã hội có meme vui như thế này</p>
+
+<blockquote>
+  <p>Tiền bạc không quan trọng - Người giàu <br />
+ Vẻ bề ngoài không quan trọng - Người đẹp</p>
+</blockquote>
+
+<p>Hay như câu nói nổi tiếng của bác Đặng Lê Nguyên Vũ:</p>
+
+<blockquote>
+  <p>Tiền nhiều để làm gì?</p>
+</blockquote>
+
+<p>Người ta sẽ bảo là: “Ông giàu rồi thì ông nói gì chả đúng, ông có phải chạy ăn từng bữa không mà nói tiền không quan trọng”.
+Hay kiểu: “Không có tiền rồi lúc ốm đau bệnh tật rồi mới biết tiền quan trọng”. Mình thấy trừ trường hợp sinh ra bị khuyêt tật, bệnh tật, hay bị tai nạn, hay gia
+đình bị bạo hành từ nhỏ thì đúng là bất hạnh thật. Mình chưa từng ở trong mọi hoàn cảnh của tất cả mọi người, nhưng mình nghĩ sinh ra có một cơ thể lành lặn
+khoẻ mạnh, gia đình bình thường đã là rất may măn rồi.</p>
+
+<p>Hồi còn bé, có những phút giây mình đã từng rất vui vẻ, hạnh phúc, buổi trưa thì đi hái quả tắm ao, đi mò cua, bắt ốc. Hồi nhỏ gia đình mình cũng chẳng có điều kiện,
+mình còn nhớ có nhà mình tỉa lạc xen kẽ với mía, thế là ăn lạc quanh năm, ấy thế mà mình vẫn chưa bao giờ chán. Những thứ đó vốn dĩ chẳng cần nhiều điều kiện. Lớn lên một
+chút, bị bao nhiêu bổn phận trách nhiệm, rồi lo lắng, rồi áp lực của một cái hình mẫu mà xã hội đặt ra, rồi tự nhiên mình lại quên đi những thứ đơn giản nhất,
+quên đi là mình vốn là những điều kiện trong hiện tại đã đủ để cho mình hạnh phúc rồi.</p>
+
+<p>Hôm qua mình được đi nghe “talk show” của thầy Minh Niệm, nghe thầy kể chuyện về một bạn trong khoá huấn luyện của thầy mà thấy thật sư khâm phục. Bạn này bị
+bệnh, nhưng có ước muốn đến gặp thầy, đã từ tận trong Nghệ An vào Đà Lạt gặp thầy. Rồi lần thứ 2 bạn gặp thầy là trong tư cách là học viên của khoá huấn luyện.
+Bạn mang trong mình bệnh tật mà còn tham gia làm lợi lạc cho biết bao nhiêu người, lúc đấy thiếu nước mình chỉ muốn tự tát vào mặt mấy cái cho tỉnh, có tí
+chuyện bé tí mà ôm mãi nhai đi nhai lại từ năm ngoái đến năm nay.</p>
+
+<p>Có một đợt trong đầu mình cứ vang đi vang lại một đoạn thơ:</p>
+
+<blockquote>
+  <p>Ta vẫn còn, đến đi thong dong <br />
+Có không, còn mất, chẳng băn khoăn <br />
+Bước chân con, hãy về thanh thản <br />
+Không tròn, không khuyết, một vầng trăng</p>
+</blockquote>
+
+<p>Mình có dịp nghe đoạn này cũng trong 1 talk show của thầy. Mình không hiểu được nhiêu lắm, nhưng mình nghĩ, chỉ cần vẫn còn sống với hiện tại là được,
+còn lại mọi sự thành bại, hợp tan, được mất, đến đi thì do duyên. Đến cũng được, mà đi cũng được.</p>]]></content><author><name>Cloud</name></author><category term="random" /><summary type="html"><![CDATA[Còn nhớ ngày này năm ngoái mình còn đang đi healing ở trên Sóc Sơn, lần ấy đi vậy mà cũng vật vã lắm.]]></summary></entry><entry><title type="html">Năm 2022 của tôi</title><link href="/my-2022/" rel="alternate" type="text/html" title="Năm 2022 của tôi" /><published>2023-01-23T00:00:00+07:00</published><updated>2023-01-23T00:00:00+07:00</updated><id>/my-2022</id><content type="html" xml:base="/my-2022/"><![CDATA[<p>Để tóm tắt năm 2022 của mình trong 1 bức hình thì có lẽ đây là bức hình mà mình thấy phù hợp nhất:
+<img src="/img/23_01_2023/sumary.jpeg" alt="" /></p>
+
+<h2 id="1nửa-đầu-năm-bình-yên">1.Nửa đầu năm bình yên</h2>
+<p>Nếu bỏ qua chuyện VNIdex lập đỉnh 1500 điểm, Nga đánh Ukraine, rồi thì đồng yên rớt giá không phanh thì cũng chả có gì đáng nói. Cuộc sống của mình vẫn bình yên, vẫn ngày đi làm, cuối tháng nhận lương, cuối tuần thì vào rừng chặt củi với anh em - ý của mình ở đây là LOL.</p>
+
+<h2 id="2nửa-cuối-năm-sóng-gió">2.Nửa cuối năm sóng gió</h2>
+<p>Thường thì trước những ngày giông bão hay có không khí lạnh về thì trước đấy đều là những ngày nắng đẹp. Năm vừa rồi
+của mình cũng vậy</p>
+
+<p>Nói sóng gió cũng không đúng lắm, dù VNindex vừa thủng từ 1500 xuống dưới 1000 điểm, vì lúc này mình đã đứng ngoài thị trường, và lúc ý chả có gì ngoài cục nợ đang phải trả cho cái tài sản đầu tiên mình mua trong đời.</p>
+
+<p>Rồi thì gặp bất như ý trong chuyện tình cảm, làm cuộc sống của mình bị đảo lộn mất một thời gian. Những cũng chính nhờ sự kiện này mà mình nghĩ bản thân mình thay đổi nhiều. Mãi sau này khi đi thiền lúc mọi người nói chuyện mình mới nhận ra, thường mỗi người sẽ bị kẹt vào một cái gì đấy, có người thì tiền bạc, có người thì địa vị, như mình thì thấy mình bị kẹt vào trong chuyện tình cảm, mà giờ mình đang cố gắng để sửa.</p>
+
+<h4 id="21-chuyện-đi-du-lịch">2.1 Chuyện đi du lịch</h4>
+<p>Khoảng giữa năm thì mình cũng trả được hết khoản nợ. Cộng thêm chuyện không như ý, với cũng lâu rồi chưa đi đâu nên
+hồi đó rủ bạn đi du lịch nghỉ dưỡng mấy hôm và điểm đến bọn mình chọn là Đà Nẵng, chẳng hiểu sao mình luôn có cảm giác thích đi Đà Nẵng, khí hậu tốt, có sông có biển, giọng người miền trong dễ thương. Hôm đi về mình đã định viết hẳn
+1 post về nó xong chả hiểu sao lại trôi đâu mất.</p>
+
+<p>Bát mì Quảng phiên bản không thấy mì đâu:
+<img src="/img/23_01_2023/IMG_0887.jpeg" alt="" /></p>
+
+<p>Trời xanh mây trắng nắng vàng:
+<img src="/img/23_01_2023/IMG_0889.jpeg" alt="" />
+<img src="/img/23_01_2023/IMG_0892.jpeg" alt="" /></p>
+
+<p>Hội An ngày không mưa:
+<img src="/img/23_01_2023/IMG_0908.jpeg" alt="" /></p>
+
+<p>Chả hiểu sao bị ấn tượng với mấy bạn nữ nhuộm tóc:</p>
+<video width="480" height="320" controls="controls">
+  <source src="https://github.com/ninhlv-9984/ninhlv-9984.github.io/raw/master/img/23_01_2023/IMG_0910.mov" type="video/mp4" />
+</video>
+
+<p>Sau lần đi Đà Nẵng 3 năm trước, nhớ cảnh 2 chị em dầm mưa trên cầu mà chả thấy rồng đâu thì giờ cũng được xem</p>
+
+<video width="480" height="320" controls="controls">
+  <source src="https://github.com/ninhlv-9984/ninhlv-9984.github.io/raw/master/img/23_01_2023/IMG_0915.mov" type="video/mp4" />
+</video>
+
+<p>Ngày cuối thì bọn mình đi Cù Lao Chàm, tính vốn chủ quan với tưởng đi về trong ngày được nên mình không mang
+sạc điện thoại, ai người đi xe máy nên bọn mình phải đi tàu ra, mà chiều về thì tàu 1 nó chạy về rồi nên phải ở lại qua đêm. Ấn tượng đầu tiên là bát mì hải sản 80K được chắc 1 gói mì hảo hảo, mấy con tôm nhỏ với mấy cọng rau, vẫn thấy còn mặn đến tận bây giờ. Buổi chiều thì bọn mình đi lặn ngắm san hô, xong rồi đến tối được chị chủ nhà nghỉ giới thiệu cho chỗ ăn, ra ăn chả khác gì nhậu ở HN, nhưng vui cái gặp mấy anh trên đảo, mấy anh hiếu khách, rồi tối còn được anh cho dắt đi đào còng nấu cháo nữa. Nhỡ nhất là cảnh hôm đó, trăng sáng, tiếng sóng thì xào xạc, sau này mà có ny kiểu gì mình cũng mình cũng rủ đi, giảm gíac thích thôi rồi =))</p>
+
+<h4 id="22-chuyện-đi-thiền">2.2 Chuyện đi thiền</h4>
+<p>Mình từng có ý định đi thiền từ rất lâu, từ hồi sinh viên, nhưng ngày đó khoá thiền mình biết chỉ có ở Củ Chi - HCM. Mà một thằng sinh viên nghèo như mình hồi đó làm gì có tiền mua vé máy bay để vào đó mà đi thiền. Rồi lại cũng nhân cơ duyên chuyện bất như ý vừa rồi, mình có thời gian quay lại, có một quãng thời gian mình nghe pháp thoại của thầy Minh Niệm rất nhiều, rồi biết đến việc thấy dùng thiền như một phương pháp chữa lành cho bệnh nhân bị các bệnh tâm lí như trầm cảm, rồi loạn lo âu, thế rồi mình cũng quyết tâm đăng kí đi một khoá thiền 10 ngày.</p>
+
+<p>Thiền đến với mình như một cái phao, ngày đó mình thấy chán mọi thứ, mình vẫn làm tốt công việc của mình, nhưng mình
+ko còn cảm nhận được niềm vui từ nó nữa. Rồi có thời gian mình cứ ở lì trong phòng, cũng không đi đâu hay tiếp xúc với ai, giờ nghĩ lại lúc mọi chuyện đã qua kiểu cười rớt nước mắt kiểu ôi hoá ra mình cũng có những ngày tháng như thế.</p>
+
+<p>Mình đi thiền ở ngay Sóc Sơn, cũng ko có gì để review nhiều, các bạn đã review rất nhiều trên mạng. Với mình, sau khoá thiền thì lợi ích to lớn đầu tiên là mình giảm tận 3kg chỉ trong vòng 10 ngày, trong này mình vẫn ăn uống đầy đủ nhé, có điều ko có đồ mặn mà chỉ toàn đồ chạy, cơ mà vẫn ngon nhé. Sau khoá thiền thì mình cũng bớt sân si hơn, rồi từ chỗ chán mọi thứ mình nhận ra: “Ủa sao mình phải vì cái abc xyz mà cảm thấy khổ vậy, ủa alo?”. Xong đợt đó tự nhiên thấy yêu đời hẳn, chuyện không vui trước kia giờ cũng chẳng còn làm mình buồn nữa. Cơ mà đợt này bận ko thiền đều đặn được lại bắt đầu thấy sân si nó vả cho vào mặt rồi.
+<img src="/img/23_01_2023/IMG_1006.jpeg" alt="" /></p>
+
+<h4 id="23-chuyện-cắt-tóc-chuyển-việc-etc">2.3 Chuyện cắt tóc, chuyển việc, etc…</h4>
+<p>Mình từng để tóc dài, có thời gian mình để với ý định đi hiến tóc, nhưng cuối năm mình phải cắt, lí do là hồi đi thiền tóc mình rụng một cách khủng khiếp, đến giờ mình chưa chụp được kiểu tóc dài nào :(
+<img src="/img/23_01_2023/IMG_1020.jpeg" alt="" /></p>
+
+<p>Rồi sau thời gian mình ở lì trong phòng, hồi đó công ty của anh đồng nghiệp cũ cần tuyển người. Xong mình được refer sang, ban đầu ý định của mình là nghỉ hẳn chỗ cũ, nhưng tháng đầu thấy sắp thời gian cũng ổn, với cũng được anh bên công ty này tạo điều kiện, nên mình cũng làm luôn việc bên này. Mình cũng muốn thử xem sức mình được đến đâu. Nói chung là công ty hồi mình định nghỉ trừ việc yên rớt giá thì với mình chả có gì để chê, nhưng hồi đó mình ở nhà lâu nữa sợ có thành vấn đề nên muốn ra ngoài để còn tiếp xúc với thế giới ngoài kia. Người ta hay bảo “đen tình đỏ bạc”, còn mình thì chắc thuộc loại “đen tình đỏ việc”.
+<img src="/img/23_01_2023/IMG_1094.jpeg" alt="" /></p>
+
+<p>Mình cũng bắt đầu ra ngoài gặp gỡ những người bạn mới
+<img src="/img/23_01_2023/img_1100x.png" alt="" /></p>
+
+<h2 id="3vài-dự-định-cho-năm-tới">3.Vài dự định cho năm tới</h2>
+<p>Năm mới luôn là thời điểm tuyệt vời cho những dự định, kế hoạch mới.</p>
+
+<p>Điều mình muốn nhất là duy trì thói quen thiền tập đều đặn, vì mình biết nếu không có một cái tâm khoẻ mạnh thì dù có bao nhiêu điều kiện của hạnh phúc đi nữa người ta cũng không thể thấy hạnh phúc được. Cuối cùng thì bạn lao ra ngoài kiếm thật nhiều tiền, tán tỉnh một ai đó rồi cố cưới cho bằng được cũng chẳng phải là để tìm kiếm cảm giác được hạnh phúc sao, nhưng thực ra nếu không hạnh phúc với điều kiện đang có trong hiện tại thì làm sao bạn chắc là những thứ đó sẽ khiến bạn thấy hạnh phúc, đây là bài học lớn nhất mà mình đã học được trong năm qua.</p>
+
+<p><img src="/img/23_01_2023/IMG_1028.jpeg" alt="" />
+Kế đến là tập thể dục đều đặn, thực ra trước khi đi thiền thì mình có đi tập gym, nhưng sau khi đi về vì bận công việc, chạy xô hết chỗ nọ đến chỗ kia nên mình cũng bỏ. Mình muốn dành nhiều thời gian hơn cho sức khoẻ, không cần phải múi nọ múi kia nhưng ít nhất là keep fit và không bị béo bụng =))</p>
+
+<p>Đọc thêm sách và thì chứng chỉ chuyên môn cũng là 1 target, nhỡ không may kinh tế khủng hoảng sếp đuổi ra đường còn
+tìm bến đỗ mới :(</p>
+
+<p>Cuối cùng là đi Đà Lạt, chả hiểu sao mình có cảm giác nhất định mình phải đi Đà Lạt nên nhất định mình sẽ đi Đà Lạt trong năm nay.</p>]]></content><author><name>Cloud</name></author><category term="random" /><summary type="html"><![CDATA[Để tóm tắt năm 2022 của mình trong 1 bức hình thì có lẽ đây là bức hình mà mình thấy phù hợp nhất:]]></summary></entry><entry><title type="html">How to disable the browser back button in JS?</title><link href="/disable-browserback/" rel="alternate" type="text/html" title="How to disable the browser back button in JS?" /><published>2020-11-24T00:00:00+07:00</published><updated>2020-11-24T00:00:00+07:00</updated><id>/disable-browserback</id><content type="html" xml:base="/disable-browserback/"><![CDATA[<h2 id="introduction">Introduction</h2>
+<p>Back to the previous page is natively controlled by your browser, it’s not a good idea for the client site perform to prevent browser back, but sometimes you have a valid reason to do that. In this post, I will show you some ways to achieve this purpose, in case I have to do the same thing in the same situation and some of my experience.</p>
+
+<h2 id="implementation">Implementation</h2>
+
+<p>The idea to prevent browser back in Javascript is when you detect user has click back button event and then you can inhibit page navigate to the previous page.
+There is some way to do that</p>
+
+<h4 id="use-the-popstate-event">Use the popstate event</h4>
+
+<p>From <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/popstate_event">MDN</a></p>
+<blockquote>
+  <p>The popstate event will be triggered by doing a browser action such as a click on the back or forward button (or calling history.back() or
+ history.forward() in JavaScript).</p>
+</blockquote>
+
+<p>To use <code class="language-plaintext highlighter-rouge">popstate</code> we do as following:</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">history</span><span class="p">.</span><span class="nx">pushState</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+
+<span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">popstate</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">history</span><span class="p">.</span><span class="nx">pushState</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+  <span class="nx">alert</span><span class="p">(</span><span class="dl">"</span><span class="s2">If you go back to the previous page, please back from the return to the previous button.</span><span class="dl">"</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div></div>
+<p>Firstly we use <code class="language-plaintext highlighter-rouge">pushState</code> to create a new history entry, and it becomes the current position in the history stack because I would change nothing, so the page looks
+the same. After that, if users press the back button from the browser, an event <code class="language-plaintext highlighter-rouge">popstate</code> will fire and we can catch it. Code inside in the event handle block
+creates the infinite loop, whenever an entry is popped from the state stack, create a new entry and push it into the history stack, after that shows an alert to the user,
+it easy to understand.</p>
+
+<p>This solution works fine. But there is some lesson I learn along the way:</p>
+
+<ul>
+  <li>
+    <p><strong>If you want to show alert to all browser, don’t use the built-in function:</strong> almost browser works fine unless you use it in safari mobile for some reason after push the new state safari mobile won’t show an alert on the screen. It’s better to build it on your own or use another library like <a href="http://bootboxjs.com/">BootboxJS</a></p>
+  </li>
+  <li>
+    <p><strong>Chrome will not allow firing popstate event unless it has user interaction</strong> for some unknown reason :shit: chrome does not allow popstate event fire if
+at least the user has interacted with the page like click, scroll,…There is a workaround is simulated by use <code class="language-plaintext highlighter-rouge">history.forward</code> and <code class="language-plaintext highlighter-rouge">history.back()</code> to allow the browser to trigger popstate event, it works fine until it has fixed in chrome version 87, f*ck that! The script below is how to use it:</p>
+  </li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">history</span><span class="p">.</span><span class="nx">pushState</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">location</span><span class="p">.</span><span class="nx">href</span><span class="p">);</span> <span class="c1">// Push new history entry to stack</span>
+<span class="nx">history</span><span class="p">.</span><span class="nx">back</span><span class="p">();</span> <span class="c1">// Back to pevious page</span>
+<span class="nx">history</span><span class="p">.</span><span class="nx">forward</span><span class="p">();</span> <span class="c1">// Forward to next page</span>
+
+<span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">popstate</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">history</span><span class="p">.</span><span class="nx">go</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+  <span class="nx">alert</span><span class="p">(</span><span class="dl">"</span><span class="s2">If you go back to the previous page, please back from the return to the previous button.</span><span class="dl">"</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Due to <code class="language-plaintext highlighter-rouge">popstate</code> both fire on <code class="language-plaintext highlighter-rouge">forward</code> and <code class="language-plaintext highlighter-rouge">back</code>, there is a little improvement to just show alert one time if use press back:</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nx">history</span><span class="p">.</span><span class="nx">pushState</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">location</span><span class="p">.</span><span class="nx">href</span><span class="p">);</span>
+<span class="nx">history</span><span class="p">.</span><span class="nx">back</span><span class="p">();</span>
+<span class="nx">history</span><span class="p">.</span><span class="nx">forward</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="kd">var</span> <span class="nx">isSafari</span> <span class="o">=</span> <span class="sr">/^</span><span class="se">((?!</span><span class="sr">chrome|android</span><span class="se">)</span><span class="sr">.</span><span class="se">)</span><span class="sr">*safari/i</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nb">navigator</span><span class="p">.</span><span class="nx">userAgent</span><span class="p">);</span>
+<span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">popstate</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">count</span><span class="o">++</span><span class="p">;</span>
+  <span class="nx">history</span><span class="p">.</span><span class="nx">go</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nx">count</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">isSafari</span> <span class="o">||</span> <span class="nx">count</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">))</span> <span class="p">{</span> <span class="c1">// In other browser, the first time user press back value of count is &gt; 2, but safari is not</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="dl">"</span><span class="s2">If you go back to the previous page, please back from the return to the previous button.</span><span class="dl">"</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>]]></content><author><name>Cloud</name></author><category term="javascript" /><category term="work" /><summary type="html"><![CDATA[Introduction Back to the previous page is natively controlled by your browser, it’s not a good idea for the client site perform to prevent browser back, but sometimes you have a valid reason to do that. In this post, I will show you some ways to achieve this purpose, in case I have to do the same thing in the same situation and some of my experience.]]></summary></entry><entry><title type="html">How To Build A Side Project</title><link href="/how-to-build-a-side-project/" rel="alternate" type="text/html" title="How To Build A Side Project" /><published>2020-04-08T00:00:00+07:00</published><updated>2020-04-08T00:00:00+07:00</updated><id>/how-to-build-a-side-project</id><content type="html" xml:base="/how-to-build-a-side-project/"><![CDATA[<h2 id="why-side-project">Why side project?</h2>
+<p>As a developer, we always need to learn to catch up with the technology which changes every day. Sometimes we can feel overwhelmingly with it, or you can feel boring
+when the major job is maintaining the old system that uses the technology of 10 years ago. So it’s time you should consider building a side project because of its benefit:</p>
+
+<ul>
+  <li>It makes you feel more interesting about programming, you are free to choose the problem you will solve, the technology stack to solve the problem, no deadline,  pressure from your boss and you can do whatever you want</li>
+  <li>You will learn more efficient, learn by doing is one of the most effective ways, you learn automatically, not only by theory but with practice</li>
+  <li>The side project is one of the fastest ways to prove your ability when you get an interview</li>
+  <li>Maybe you will be famous, who knows, Angular and Vue originally just a side project before it becomes popular</li>
+</ul>
+
+<p>With all of that, we will go through the step to build a side project</p>
+
+<h2 id="1-choose-the-problem-to-solve">1. Choose the problem to solve</h2>
+
+<p>The easy way to find a problem is “scratch your itch place”, you like play lottery, you can build the system to predict the lottery results, you like watching beautiful girls
+you can build a system to claw the image from outside internet to you local machine like this  :grin:
+<img src="https://raw.githubusercontent.com/oLeVanNinh/javascipt/master/pupunteer-claw-facebook-images/imge-data/Screenshot%20from%202019-03-10%2021-42-38.png" alt="" /></p>
+
+<p align="center">
+  <strike>
+    <small>
+    If you are interested, I have written a
+    <a href="https://github.com/oLeVanNinh/javascipt/blob/report_december/pupunteer-claw-facebook-images/REAME.md">post</a> about it
+    </small>
+  </strike>
+</p>
+
+<p>Seriously, in my case, I have heard if you know how many time it remained in the day, you will work more effectively because you will feel the time for you is short. But I cannot find any app or extension that meet my need, so I was building a simple page <a href="https://count-down-remain-time.herokuapp.com/">app</a>, host it to Heroku
+and combined it with custom tab page URL <a href="https://chrome.google.com/webstore/detail/custom-new-tab-url/mmjbdbjnoablegbkcklggeknkfcjkjia?hl=en">extention</a>, every time I open
+a new tab, I will know exactly how much time remains in the day and my problem was solved :blush:</p>
+
+<p>Another way is solving the problem of other people from your friend, coworker or someone else like you can find many ideas on  <a href="https://www.ideaswatch.com/">Idea Watch</a></p>
+
+<p>Finally, you can start “reinvent the wheel”, by developing the idea from the tutorial or clone from the other and add or custom some features you want.</p>
+
+<h2 id="2-define-the-success">2. Define the success</h2>
+
+<p>After knowing what you want to build, it is important to know when it “done”. It because without it, you are more likely to fall into a <strong>perfect plan</strong> to build a <strong>perfect app</strong> which is what you quit before you get it done. <del>I myself was like that several time</del>.</p>
+
+<p>As a developer, I think you know that there is not thing perfect from scratch, every app we build, it starts with version 1.0. Over time, we improve it and later releases, we upgrade it to version  1.1, 1.2,2.0, … so on. This is the mindset we will apply for our side project we break it in into small main functions and you can consider your project has done when you finish all that function and you can improve it later if you want. If it is possible, I recommend you divide each function so that you can finish in one or two hours to enhance the chance that you are not quit :grin:</p>
+
+<p>For example, when learning angular and <del>trying to build a chat app that can substitute for my company</del> socket-io to build a real-time application, so I decided to build a
+chat app. So I define with a list of the user stories:</p>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />User can create an account</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add support for nicknames.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />User can create a chat room</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />User can join a chat room</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Show who’s online.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Broadcast a message to connected users when someone send a message in a chat room</li>
+</ul>
+
+<p>After done all of this user stories, I consider that my project have done and maybe upgrade it later if neccessary <del>or I like</del></p>
+<h2 id="3-get-it-done-and-release-it">3. Get it done and release it</h2>
+
+<p>After all, this is the most funny part, I will tell you how I was building chat app above and what I have learn.</p>
+
+<p>Firstly is choose technology, because during that time I trying to learn Javascript as much as possible and I decided to build a full-stack app with all front-end and back-end so I use MEAN stack although I don’t know much about ExpressJS and MongoDB.</p>
+
+<p>The UI was build using from Angular Material, at first it is difficult when working with moongse but it becomes easier later, maybe scope of this user story is
+too small :relieved:, when working with back-end, the hardest part is organized folder struct and code.</p>
+
+<div align="center">
+  <img src="/img/side_project_post/code_struct.png" />
+</div>
+
+<p align="center">
+<small><i>I was organized code struct like in Rails app</i></small>
+</p>
+
+<p>In this part, I almost not follow a specific tutorial, but I find almost information and knowledge specific to help a feature done. From how to use socket client in Angular,
+how to setup, connect, create schema with moongse, writing API with NodeJS and Express, …</p>
+
+<p>After sometimes coding, almost functions had done, not perfect but it works. You can find it in this <a href="https://github.com/oLeVanNinh/chat">repo</a></p>
+
+<p>The last step is to introduce your app for your friends, community. <del>I think I too shy to do that</del>. To do that, if it is a web application you can host it on a host like
+Heroku, if it is an android application, you can build APK and then invite your friend use it. What about iOS, it is better if you upload it on AppStore :grin:</p>]]></content><author><name>Cloud</name></author><category term="random" /><category term="work" /><summary type="html"><![CDATA[Why side project? As a developer, we always need to learn to catch up with the technology which changes every day. Sometimes we can feel overwhelmingly with it, or you can feel boring when the major job is maintaining the old system that uses the technology of 10 years ago. So it’s time you should consider building a side project because of its benefit:]]></summary></entry><entry><title type="html">Vài ghi chép về replace function JS</title><link href="/v%C3%A0i-ghi-ch%C3%A9p-v%E1%BB%81-replace-js/" rel="alternate" type="text/html" title="Vài ghi chép về replace function JS" /><published>2019-06-09T00:00:00+07:00</published><updated>2019-06-09T00:00:00+07:00</updated><id>/v%C3%A0i-ghi-ch%C3%A9p-v%E1%BB%81-replace-js</id><content type="html" xml:base="/v%C3%A0i-ghi-ch%C3%A9p-v%E1%BB%81-replace-js/"><![CDATA[<p>Việc xử lý <code class="language-plaintext highlighter-rouge">String</code> là việc được thực hiện khá nhiều trong lập trình, một trong các thao tác thực hiện trong số đó là <code class="language-plaintext highlighter-rouge">replace String</code>. Trong ngôn ngữ <code class="language-plaintext highlighter-rouge">Javascript</code>,
+method được dùng để xử lý là <code class="language-plaintext highlighter-rouge">replace</code>, là một Standard built-in method của <code class="language-plaintext highlighter-rouge">String</code>. Tài liệu về cách sử dụng được viết đầy đủ <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace">MDN</a>, tóm tắt lại cơ bản như sau:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/*
+Syntax sử dụng:
+ var newStr = str.replace(keyword || Regex, newSubstr || function)
+Phần đầu có thể truyền vào là một chuỗi String hoặc Regex, phần sau sẽ
+là chuỗi String để thay thế hoặc một callback function Callback functions
+sẽ nhận vào 3 parameter là match, offset và string ban đầu.
+*/</span>
+<span class="dl">'</span><span class="s1">hello world</span><span class="dl">'</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="dl">'</span><span class="s1">h</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">H</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// Hello world</span>
+
+<span class="dl">'</span><span class="s1">hello world</span><span class="dl">'</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/l/g</span><span class="p">,</span> <span class="dl">'</span><span class="s1">n</span><span class="dl">'</span><span class="p">)</span> <span class="c1">// henno wornd"</span>
+
+<span class="dl">'</span><span class="s1">hello world</span><span class="dl">'</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/l/g</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">match</span><span class="p">,</span> <span class="nx">offset</span><span class="p">,</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">`Matching: </span><span class="p">${</span><span class="nx">match</span><span class="p">}</span><span class="s2">, offset: </span><span class="p">${</span><span class="nx">offset</span><span class="p">}</span><span class="s2">, string: </span><span class="p">${</span><span class="nx">string</span><span class="p">}</span><span class="s2">`</span><span class="p">)</span>
+  <span class="k">return</span> <span class="dl">'</span><span class="s1">n</span><span class="dl">'</span>
+<span class="p">})</span>
+<span class="cm">/*
+Matching: l, offset: 2, string: hello world
+Matching: l, offset: 3, string: hello world
+Matching: l, offset: 9, string: hello world
+"henno wornd"
+*/</span>
+</code></pre></div></div>
+<h2 id="problem">Problem</h2>
+
+<p>Sự thật là sẽ chẳng có cái bài viết này cho đến khi tui có làm một task nho nhỏ là highlight keyword của kết quả search trả về.
+Function ban đầu trả như sau chỉ đơn giản như sau:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="kd">var</span> <span class="nx">s_tag</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">&lt;span class="search-result"&gt;</span><span class="dl">'</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">e_tag</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">&lt;/span&gt;</span><span class="dl">'</span><span class="p">;</span>
+
+  <span class="nb">String</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">keyword</span><span class="p">,</span> <span class="nx">s_tag</span> <span class="o">+</span> <span class="nx">keyword</span> <span class="o">+</span> <span class="nx">e_tag</span><span class="p">);</span>
+
+  <span class="dl">"</span><span class="s2">Everything is Illuminated</span><span class="dl">"</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="dl">"</span><span class="s2">E</span><span class="dl">"</span><span class="p">,</span> <span class="nx">s_tag</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">E</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">e_tag</span><span class="p">);</span>
+<span class="c1">//"&lt;span class="search-result"&gt;E&lt;/span&gt;verything is Illuminated"</span>
+</code></pre></div></div>
+
+<p>Nếu chỉ dừng lại ở đây thì mọi thứ đều tốt đẹp và chẳng có gì để làm tiếp, cho đến khi tui quyết định mở rộng nó thành highlight toàn bộ keyword match và bất kể là có sensetive hay không.
+Ban đầu tui nghĩ mọi chuyện khá là đơn giản, chỉ việc match toàn bộ keyword, sau đó lần lượt replace từng thằng một:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">keyword_highlighting</span><span class="p">(</span><span class="nx">keyword</span><span class="p">,</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">pattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">keyword</span><span class="p">,</span> <span class="dl">'</span><span class="s1">gi</span><span class="dl">'</span><span class="p">);</span>
+  <span class="kd">let</span> <span class="nx">matches</span> <span class="o">=</span> <span class="nx">string</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">pattern</span><span class="p">);</span>
+  <span class="c1">// Chắc chắn ko bị duplicate thằng nào.</span>
+  <span class="nx">matches</span> <span class="o">=</span> <span class="p">[...</span><span class="k">new</span> <span class="nb">Set</span><span class="p">(</span><span class="nx">matches</span><span class="p">)];</span>
+
+  <span class="nx">matches</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">match</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">matching_pattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">match</span><span class="p">,</span> <span class="dl">'</span><span class="s1">g</span><span class="dl">'</span><span class="p">);</span>
+    <span class="nx">string</span> <span class="o">=</span> <span class="nx">string</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">matching_pattern</span><span class="p">,</span> <span class="nx">s_tag</span> <span class="o">+</span> <span class="nx">match</span> <span class="o">+</span> <span class="nx">e_tag</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">string</span><span class="p">)</span>
+  <span class="p">});</span>
+
+  <span class="k">return</span> <span class="nx">string</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">string</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">Everything is Illuminated</span><span class="dl">"</span>
+<span class="nx">keyword_highlighting</span><span class="p">(</span><span class="dl">"</span><span class="s2">i</span><span class="dl">"</span><span class="p">,</span> <span class="nx">string</span><span class="p">)</span>
+<span class="c1">// Everything is Illuminated</span>
+<span class="c1">// Thật ra là chỗ mấy chữ i cho hiển thị có đổi màu chút xíu 😌</span>
+
+<span class="nx">keyword_highlighting</span><span class="p">(</span><span class="dl">"</span><span class="s2">e</span><span class="dl">"</span><span class="p">,</span> <span class="nx">string</span><span class="p">)</span>
+<span class="c1">// earch-result"&gt;Everything is Illuminated</span>
+<span class="c1">// WTF 😳😳😳</span>
+</code></pre></div></div>
+
+<p>Vấn đề nằm ở chỗ là khi keyword tồn tại trong cả <code class="language-plaintext highlighter-rouge">s_tag</code> và <code class="language-plaintext highlighter-rouge">e_tag</code> thì ở chỗ phần <code class="language-plaintext highlighter-rouge">forEach</code> chạy sẽ replace cả keyword nằm trong thẻ đó.
+Khi keyword là <code class="language-plaintext highlighter-rouge">e</code> thì kết quả function trả về thật sự sẽ là:</p>
+
+<p><code class="language-plaintext highlighter-rouge">&lt;span class="s&lt;span class="search-result"&gt;e&lt;/span&gt;arch-r&lt;span class="search-result"&gt;e&lt;/span&gt;sult"&gt;E&lt;/span&gt;v&lt;span class="search-result"&gt;e&lt;/span&gt;rything is Illuminat&lt;span class="search-result"&gt;e&lt;/span&gt;d</code></p>
+
+<h2 id="solution">Solution</h2>
+
+<p>Biết được nguyên nhân rồi thì đi tìm giải pháp, giải pháp đầu tiên tui nghĩ ra là viết một đoạn <code class="language-plaintext highlighter-rouge">Regex</code> sao cho không nó không match với các keyword nằm trong thẻ <code class="language-plaintext highlighter-rouge">tag</code>.
+Sau một hồi suy nghĩ rồi, rồi lấy gương ra soi, nhìn thật kĩ mặt mình, tui nhận ra là tui đ** đủ khả năng để viết 🙁, bạn nào tình cờ đọc qua viết được thì có thể comment xuống dưới nha.
+Cuối cùng thì tui chọn giải pháp đơn giản hơn, là tui sẽ match cả thẻ <code class="language-plaintext highlighter-rouge">tag</code> và <code class="language-plaintext highlighter-rouge">keyword</code>, nhưng lúc replace sẽ kiểm tra xem nếu đó là <code class="language-plaintext highlighter-rouge">tag</code> thì sẽ return về chính nó, để làm được điều này cũng
+phải nhờ đến sự magic của callback trong replace 🤗. Implement phần này viết lại <code class="language-plaintext highlighter-rouge">function</code> như sau:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="kd">function</span> <span class="nx">keyword_highlighting</span><span class="p">(</span><span class="nx">keyword</span><span class="p">,</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">pattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">keyword</span><span class="p">,</span> <span class="dl">"</span><span class="s2">gi</span><span class="dl">"</span><span class="p">);</span>
+    <span class="kd">let</span> <span class="nx">matches</span> <span class="o">=</span> <span class="nx">string</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">pattern</span><span class="p">);</span>
+    <span class="nx">matches</span> <span class="o">=</span> <span class="p">[...</span><span class="k">new</span> <span class="nb">Set</span><span class="p">(</span><span class="nx">matches</span><span class="p">)];</span>
+
+    <span class="nx">matches</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">match</span><span class="p">){</span>
+      <span class="kd">let</span> <span class="nx">matching_pattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="s2">`&lt;[^&lt;&gt;]+&gt;|</span><span class="p">${</span><span class="nx">match</span><span class="p">}</span><span class="s2">`</span><span class="p">,</span> <span class="dl">"</span><span class="s2">g</span><span class="dl">"</span><span class="p">);</span>
+      <span class="nx">string</span> <span class="o">=</span> <span class="nx">string</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">matching_pattern</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">matched</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">matched</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">&lt;</span><span class="dl">'</span> <span class="p">?</span> <span class="nx">matched</span> <span class="p">:</span> <span class="p">(</span><span class="nx">s_tag</span> <span class="o">+</span> <span class="nx">matched</span> <span class="o">+</span> <span class="nx">e_tag</span><span class="p">)</span>
+      <span class="p">})</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="p">}</span>
+
+<span class="nx">keyword_highlighting</span><span class="p">(</span><span class="dl">'</span><span class="s1">e</span><span class="dl">'</span><span class="p">,</span> <span class="nx">string</span><span class="p">)</span>
+<span class="c1">// Everything is Illuminated</span>
+<span class="c1">// Working fine</span>
+</code></pre></div></div>
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Callback trong <code class="language-plaintext highlighter-rouge">JS</code> là thứ vô cùng mạnh mẽ, như tui nghĩ sẽ chẳng bao giờ sẽ phải dùng đến callback trong replace vì như trên đã đủ rồi, nhưng trong nhiều trường hợp nó lại giúp
+giải quyết vẫn đề đơn giản hơn nhiều. Như ông thầy tui bảo: “Sẽ có một ngày thứ em nghĩ là không dùng đến sẽ cứu em” sau khi thầy xem xong bộ phim <code class="language-plaintext highlighter-rouge">Người trở về từ sao Hỏa</code> 😎.</p>]]></content><author><name>Cloud</name></author><category term="javascript" /><category term="replace" /><category term="replace callback" /><category term="work" /><summary type="html"><![CDATA[Việc xử lý String là việc được thực hiện khá nhiều trong lập trình, một trong các thao tác thực hiện trong số đó là replace String. Trong ngôn ngữ Javascript, method được dùng để xử lý là replace, là một Standard built-in method của String. Tài liệu về cách sử dụng được viết đầy đủ MDN, tóm tắt lại cơ bản như sau:]]></summary></entry><entry><title type="html">Xây dựng hệ thống xử lý background bằng ruby</title><link href="/buiding-background-process-ruby/" rel="alternate" type="text/html" title="Xây dựng hệ thống xử lý background bằng ruby" /><published>2019-05-28T00:00:00+07:00</published><updated>2019-05-28T00:00:00+07:00</updated><id>/buiding-background-process-ruby</id><content type="html" xml:base="/buiding-background-process-ruby/"><![CDATA[<h1 id="1-lợi-ích-của-việc-sử-dụng-background-job">1. Lợi ích của việc sử dụng background job</h1>
+<p>Đối với ứng dụng viết bằng Rails, mỗi khi có request đến, webserver tiếp nhận request và trả về resoponse, tại sao chúng ta cần sử  dụng background? Bởi vì đối với những request
+cần phải tốn nhiều thời gian để xử lý như gửi email, import hay export với lượng data lớn, khi request được xử lý sẽ chặn các request khác, trong trường hợp xử lý quá lâu sẽ gây
+lỗi Timeout ảnh hưởng đến trải nghiệm người dùng. Để ứng dụng có thể hoạt động trơn chu, mượt mà hơn và ít bị người dùng chửi là web lởm vl 😬, người ta nghĩ ra cách cho những tác vụ
+này chạy trong nền. Ví dụ như việc xử  dụng chức năng export CSV, khi người dùng click vào nút export thì ta sẽ cho phần export và generate file chạy ngầm, khi chạy xong thì gửi file cho người
+dùng,thao tác của người dùng không bị gián đoạn.</p>
+
+<p>Bản thân Rails có Active Job, có chức năng là lưu trử và thực hiện các job, nhưng để enqueuing và executing job ta cần sử dụng framework thứ 3:</p>
+<blockquote>
+  <p>For enqueuing and executing jobs in production you need to set up a queuing backend, that is to say you need to decide for a 3rd-party queuing library that Rails should use. Rails itself only provides an in-process queuing system, which only keeps the jobs in RAM. If the process crashes or the machine is reset, then all outstanding jobs are lost with the default async backend. This may be fine for smaller apps or non-critical jobs, but most production apps will need to pick a persistent backend.</p>
+</blockquote>
+
+<p>Rails có framework để thực hiện Background Job phổ biến như Sidekiq, Delay::Job, Sucker Punch, và những framework đó không nằm trong nội dung của bài viết này. 😁</p>
+
+<h1 id="2-xây-dựng-hệ-thống-xử-lý-background-bằng-ruby">2. Xây dựng hệ thống xử lý background bằng ruby</h1>
+
+<h3 id="extractitle-task">Extractitle Task</h3>
+
+<p>Giả sử ta có một list các website và phầ này ta xây dụng một task lần lượt lấy từng title từ url đó, bằng việc sử dụng OpenURI và Nokogiri:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'open-uri'</span>
+<span class="nb">require</span> <span class="s1">'nokogiri'</span>
+
+<span class="k">class</span> <span class="nc">TitleExtractService</span>
+  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">document</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">document</span><span class="p">.</span><span class="nf">css</span><span class="p">(</span><span class="s1">'html &gt; head &gt; title'</span><span class="p">).</span><span class="nf">first</span><span class="p">.</span><span class="nf">content</span>
+    <span class="nb">puts</span> <span class="n">title</span>
+  <span class="k">rescue</span>
+    <span class="nb">puts</span> <span class="s2">"Unable to open </span><span class="si">#{</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="no">TitleExtractService</span><span class="p">.</span><span class="nf">new</span><span class="p">.</span><span class="nf">call</span><span class="p">(</span><span class="s2">"http://xem.vn"</span><span class="p">)</span>
+<span class="c1"># Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+</code></pre></div></div>
+
+<p>Refactor một chút bằng việc thêm module <code class="language-plaintext highlighter-rouge">Worker</code> vào trong Object Service như sau:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Extractor</span>
+  <span class="k">module</span> <span class="nn">Worker</span>
+     <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+       <span class="n">base</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="no">ClassMethods</span><span class="p">)</span>
+     <span class="k">end</span>
+
+     <span class="k">module</span> <span class="nn">ClassMethods</span>
+       <span class="k">def</span> <span class="nf">perform_now</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+         <span class="n">new</span><span class="p">.</span><span class="nf">perform</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+       <span class="k">end</span>
+     <span class="k">end</span>
+
+     <span class="k">def</span> <span class="nf">perform</span>
+       <span class="k">raise</span> <span class="no">NotImplementedError</span>
+     <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">TitleExtractWorker</span>
+  <span class="kp">include</span> <span class="no">Extractor</span><span class="o">::</span><span class="no">Worker</span>
+
+  <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">document</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">document</span><span class="p">.</span><span class="nf">css</span><span class="p">(</span><span class="s1">'html &gt; head &gt; title'</span><span class="p">).</span><span class="nf">first</span><span class="p">.</span><span class="nf">content</span>
+    <span class="nb">puts</span> <span class="n">title</span>
+  <span class="k">rescue</span>
+    <span class="nb">puts</span> <span class="s2">"Unable to open </span><span class="si">#{</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="no">TitleExtractService</span><span class="p">.</span><span class="nf">perform_now</span><span class="p">(</span><span class="s2">"http://xem.vn"</span><span class="p">)</span>
+<span class="c1"># Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che hai</span>
+</code></pre></div></div>
+
+<p>Giải thích một chút: ở đây ta tạo thêm <code class="language-plaintext highlighter-rouge">module Worker</code>, khi được include vào trong class, nhờ việc sử dụng method <code class="language-plaintext highlighter-rouge">included</code>, method trong <code class="language-plaintext highlighter-rouge">module ClassMethods</code> được <code class="language-plaintext highlighter-rouge">extend</code> cho <code class="language-plaintext highlighter-rouge">TitleExtractWorker</code>, khi đó ta có thể sử dụng method <code class="language-plaintext highlighter-rouge">perform_now</code>, nó sẽ tạo một <code class="language-plaintext highlighter-rouge">instance</code> và call method <code class="language-plaintext highlighter-rouge">peform</code> (trong có vẻ giống sidekiq 😉)</p>
+
+<h3 id="implementing-asynchronous-process">Implementing Asynchronous Process</h3>
+
+<p>Giả sử ta có một constant <code class="language-plaintext highlighter-rouge">Title</code> vơi list URL của các site cần phải lấy, mà list này từ đâu ra? Đối với người lười như mình thì dump lại cái URl nhiều lần có vẻ khả thi nhất  ☺️</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">SITE_URLS</span> <span class="o">=</span> <span class="no">Array</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"http://xem.vn"</span> <span class="p">}</span>
+
+<span class="no">SITE_URLS</span><span class="p">.</span><span class="nf">each_with_index</span> <span class="k">do</span> <span class="o">|</span><span class="n">url</span><span class="p">,</span> <span class="n">index</span><span class="o">|</span>
+  <span class="nb">puts</span> <span class="s2">"Numerical Order: </span><span class="si">#{</span><span class="n">index</span><span class="si">}</span><span class="s2">, </span><span class="si">#{</span><span class="no">TitleExtractWorker</span><span class="p">.</span><span class="nf">perform_now</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+<span class="k">end</span>
+
+<span class="c1"># Numerical Order: 0,</span>
+<span class="c1"># Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Numerical Order: 1,</span>
+<span class="c1"># Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Numerical Order: 2,</span>
+<span class="c1"># Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Numerical Order: 3,</span>
+<span class="c1"># ....</span>
+</code></pre></div></div>
+
+<p>Thanks God, it works 😂, nhưng điều kể đến ở đây là các việc các request được xử lý cách tuần tự, nghĩa là request sau phải chờ request trước hoàn thành rồi mới được thực thi.
+Để tăng tốc độ sử lý ta thêm method <code class="language-plaintext highlighter-rouge">perform_async</code> bằng cách tạo thêm <code class="language-plaintext highlighter-rouge">Thread</code> để xử lý cho mỗi URL.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Extractor</span>
+  <span class="k">module</span> <span class="nn">Worker</span>
+    <span class="k">module</span> <span class="nn">ClassMethods</span>
+      <span class="k">def</span> <span class="nf">perform_async</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="no">Thread</span><span class="p">.</span><span class="nf">new</span> <span class="k">do</span>
+          <span class="n">new</span><span class="p">.</span><span class="nf">perform</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Sau khi thay đổi bằng việc gọi <code class="language-plaintext highlighter-rouge">TitleExtractWorker.perform_now(url)</code>, ta thu được tất cả các Title tại một thời điểm, tuy nhiên để làm được điều đó ta gần như mở 10 connection request tại một thời điểm 😂. Với thay đổi như thế này ta có thể  gặp vấn đề  về giới hạn cả server của ta (việc mở nhiều Thread đồng thời yêu cầu khả năng xử lý và tốn memory) và Site mà ta đang access (có thể xử lý đồng thời nhiều một lúc như thế hay không)</p>
+
+<h3 id="queueing-task">Queueing Task</h3>
+<p>Để xử lý vẫn đề trên ta sử dụng <code class="language-plaintext highlighter-rouge">Producer–Consumer </code> pattern, bằng cách xử dụng một <code class="language-plaintext highlighter-rouge">Queue</code> trung gian, mỗi khi có task phía <code class="language-plaintext highlighter-rouge">Producer</code>  sẽ đấy task vào <code class="language-plaintext highlighter-rouge">Queue</code> và <code class="language-plaintext highlighter-rouge">Consumer</code> sẽ kéo task từ
+<code class="language-plaintext highlighter-rouge">Queue</code> về và xử lý.</p>
+
+<p><img src="/img/28_05_2019/consummer.png" alt="" /></p>
+
+<p>Ta thêm <code class="language-plaintext highlighter-rouge">Queue</code> như sau:</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Extractor</span>
+  <span class="k">module</span> <span class="nn">Worker</span>
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">queue</span>
+      <span class="vi">@queue</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">queue</span><span class="o">=</span><span class="p">(</span><span class="n">queue</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="no">Extractor</span><span class="o">::</span><span class="no">Worker</span><span class="p">.</span><span class="nf">queue</span> <span class="o">=</span> <span class="no">Queue</span><span class="p">.</span><span class="nf">new</span>
+</code></pre></div></div>
+<p>Và thay đổi method <code class="language-plaintext highlighter-rouge">perform_async</code>:</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">...</span>
+  <span class="k">def</span> <span class="nf">perform_async</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="no">Extractor</span><span class="o">::</span><span class="no">Worker</span><span class="p">.</span><span class="nf">queue</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="ss">worker: </span><span class="nb">self</span><span class="p">,</span> <span class="ss">args: </span><span class="n">args</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="o">...</span>
+</code></pre></div></div>
+
+<p>Đến phần tạo <code class="language-plaintext highlighter-rouge">Consummer</code>:</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">Extractor</span>
+  <span class="k">class</span> <span class="nc">WorkerExcuting</span>
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">start</span><span class="p">(</span><span class="n">concurrency</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+      <span class="n">concurrency</span><span class="p">.</span><span class="nf">times</span> <span class="k">do</span> <span class="o">|</span><span class="n">n</span><span class="o">|</span>
+        <span class="n">new</span><span class="p">(</span><span class="s2">"Worker </span><span class="si">#{</span><span class="n">n</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+      <span class="n">thread</span> <span class="o">=</span> <span class="no">Thread</span><span class="p">.</span><span class="nf">new</span> <span class="k">do</span>
+        <span class="kp">loop</span> <span class="k">do</span>
+          <span class="n">payload</span> <span class="o">=</span> <span class="no">Extractor</span><span class="o">::</span><span class="no">Worker</span><span class="p">.</span><span class="nf">queue</span><span class="p">.</span><span class="nf">pop</span>
+          <span class="n">worker_class</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="ss">:worker</span><span class="p">]</span>
+          <span class="n">worker_class</span><span class="p">.</span><span class="nf">new</span><span class="p">.</span><span class="nf">perform</span><span class="p">(</span><span class="o">*</span><span class="n">payload</span><span class="p">[</span><span class="ss">:args</span><span class="p">])</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+
+      <span class="n">thread</span><span class="p">.</span><span class="nf">name</span> <span class="o">=</span> <span class="nb">name</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<p>Ở phầ n này tùy thuộc vào số lượng <code class="language-plaintext highlighter-rouge">Thread</code> muốn thực hiện cách đồng thời mà ở khởi tạo ở phần <code class="language-plaintext highlighter-rouge">start</code>. Ta sử lại một chút method <code class="language-plaintext highlighter-rouge">perform</code> như sau:</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">document</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">document</span><span class="p">.</span><span class="nf">css</span><span class="p">(</span><span class="s1">'html &gt; head &gt; title'</span><span class="p">).</span><span class="nf">first</span><span class="p">.</span><span class="nf">content</span>
+    <span class="nb">puts</span> <span class="s2">"Current worker </span><span class="si">#{</span><span class="no">Thread</span><span class="p">.</span><span class="nf">current</span><span class="p">.</span><span class="nf">name</span><span class="si">}</span><span class="s2"> excute  </span><span class="si">#{</span><span class="n">title</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">rescue</span>
+    <span class="nb">puts</span> <span class="s2">"Unable to open </span><span class="si">#{</span><span class="n">url</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+
+<span class="no">Extractor</span><span class="o">::</span><span class="no">WorkerExcuting</span><span class="p">.</span><span class="nf">start</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="c1"># Current worker Worker 0 excute  Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Current worker Worker 1 excute  Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Current worker Worker 2 excute  Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Current worker Worker 1 excute  Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Current worker Worker 3 excute  Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+<span class="c1"># Current worker Worker 2 excute  Cộng đồng chế ảnh troll,  xem ảnh vui nhộn, anh che haivl</span>
+</code></pre></div></div>
+
+<h3 id="queueing-task-with-redis">Queueing Task With Redis</h3>
+<p>Thay vì sử dụng <code class="language-plaintext highlighter-rouge">Queue</code> implement bở <code class="language-plaintext highlighter-rouge">ruby</code> phần này ta sử dụng <code class="language-plaintext highlighter-rouge">Redis</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'redis'</span>
+<span class="nb">require</span> <span class="s1">'json'</span>
+<span class="k">module</span> <span class="nn">Extractor</span>
+  <span class="k">module</span> <span class="nn">Worker</span>
+    <span class="k">class</span> <span class="nc">Redis</span>
+      <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">redis</span> <span class="o">=</span> <span class="o">::</span><span class="no">Redis</span><span class="p">.</span><span class="nf">new</span><span class="p">)</span>
+        <span class="vi">@redis</span> <span class="o">=</span> <span class="n">redis</span>
+      <span class="k">end</span>
+
+      <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+        <span class="vi">@redis</span><span class="p">.</span><span class="nf">rpush</span><span class="p">(</span><span class="s2">"extract_worker"</span><span class="p">,</span> <span class="no">JSON</span><span class="p">.</span><span class="nf">dump</span><span class="p">(</span><span class="n">job</span><span class="p">))</span>
+      <span class="k">end</span>
+
+      <span class="k">def</span> <span class="nf">pop</span>
+        <span class="n">_queue</span><span class="p">,</span> <span class="n">payload</span> <span class="o">=</span> <span class="vi">@redis</span><span class="p">.</span><span class="nf">blpop</span><span class="p">(</span><span class="s2">"extract_worker"</span><span class="p">)</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="no">JSON</span><span class="p">.</span><span class="nf">parse</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="ss">symbolize_names: </span><span class="kp">true</span><span class="p">)</span>
+        <span class="n">payload</span><span class="p">[</span><span class="ss">:worker</span><span class="p">]</span> <span class="o">=</span> <span class="no">Object</span><span class="p">.</span><span class="nf">const_get</span><span class="p">(</span><span class="n">payload</span><span class="p">[</span><span class="ss">:worker</span><span class="p">])</span>
+        <span class="n">payload</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="no">Extractor</span><span class="o">::</span><span class="no">Worker</span><span class="p">.</span><span class="nf">queue</span> <span class="o">=</span> <span class="no">Extractor</span><span class="o">::</span><span class="no">Worker</span><span class="o">::</span><span class="no">Redis</span><span class="p">.</span><span class="nf">new</span>
+</code></pre></div></div>
+
+<p>Redis không phân biết được Ruby Object nên ta parse thành dạng JSON trước khi lưu trữ lại bằng Redis bằng việc sử dụng method <code class="language-plaintext highlighter-rouge">rpush</code>. Ta lấy object từ Redis bằng việc sử dụng
+method <code class="language-plaintext highlighter-rouge">blpop</code>, khi Redis rỗng nó sẽ đợi cho tới khi có object có thể lấy được từ Redis, bằng cách này <code class="language-plaintext highlighter-rouge">Worker</code> cũng sẽ  chờ cho tới khi Queue có data để xử lý. Việc cuối cùng là chuyển
+<code class="language-plaintext highlighter-rouge">String</code> thành <code class="language-plaintext highlighter-rouge">Object Class</code> của Ruby khi đã fetch data từ Redis về. Để kiểm tra và chắc là <code class="language-plaintext highlighter-rouge">Worker</code> của mình hoạt động tốt, có thể mở terminal mới, add thêm job vào Redis queue và
+xem điều kì lạ xảy ra =))</p>]]></content><author><name>Cloud</name></author><category term="ruby" /><category term="background" /><category term="work" /><summary type="html"><![CDATA[1. Lợi ích của việc sử dụng background job Đối với ứng dụng viết bằng Rails, mỗi khi có request đến, webserver tiếp nhận request và trả về resoponse, tại sao chúng ta cần sử dụng background? Bởi vì đối với những request cần phải tốn nhiều thời gian để xử lý như gửi email, import hay export với lượng data lớn, khi request được xử lý sẽ chặn các request khác, trong trường hợp xử lý quá lâu sẽ gây lỗi Timeout ảnh hưởng đến trải nghiệm người dùng. Để ứng dụng có thể hoạt động trơn chu, mượt mà hơn và ít bị người dùng chửi là web lởm vl 😬, người ta nghĩ ra cách cho những tác vụ này chạy trong nền. Ví dụ như việc xử dụng chức năng export CSV, khi người dùng click vào nút export thì ta sẽ cho phần export và generate file chạy ngầm, khi chạy xong thì gửi file cho người dùng,thao tác của người dùng không bị gián đoạn.]]></summary></entry></feed>
